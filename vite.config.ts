@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/icon-192.png', 'icons/icon-512.png'],
       manifest: {
-        name: 'Lodestone',
-        short_name: 'Lodestone',
+        name: 'Park Trace',
+        short_name: 'Park Trace',
         description: 'Your phone remembers the walk, not the pin. Interactive prototype.',
         display: 'standalone',
         orientation: 'portrait',

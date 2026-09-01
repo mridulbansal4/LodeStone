@@ -1,10 +1,8 @@
-# Lodestone — interactive prototype
+# Park Trace — interactive prototype
 
 **Your phone remembers the walk, not the pin.**
 
-A lodestone is naturally magnetised rock — the original compass. The name is literal: in a parking
-garage the magnetic field is far too distorted to point north, but that same distortion is stable
-enough to identify *where you are*. Lodestone throws away the compass and keeps the fingerprint.
+Park Trace enables indoor localization and return navigation in multi-level parking garages without GPS, beacons, venue apps, or camera scanning. By combining inertial dead reckoning with magnetic field sequence fingerprints, Park Trace passively records the walk away from your car and reliably guides you back.
 
 A playable web prototype: park in a multi-floor mall, walk away, and the phone
 records the route with no action from you — then guides you back through the building.

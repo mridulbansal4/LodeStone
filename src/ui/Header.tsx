@@ -1,13 +1,18 @@
 import { useUi, setUi } from '../sim/store'
 import { startDemo } from '../sim/actions'
+import parkTraceLogo from '../assets/PARKTRACE_LOGO_WITHTEXT.png'
 
 export function Header() {
   const route = useUi((s) => s.route)
 
   return (
     <header className="mc-header-row" aria-label="Header">
-      <div className="mc-brand-open">
-        <span className="mc-brand-title">LodeStone</span>
+      <div className="mc-brand-open" onClick={() => setUi({ route: 'overview' })} style={{ cursor: 'pointer' }}>
+        <img 
+          src={parkTraceLogo} 
+          alt="Park Trace" 
+          className="mc-brand-logo" 
+        />
       </div>
 
       <nav className="mc-nav-pill" aria-label="Main Navigation">

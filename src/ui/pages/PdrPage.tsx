@@ -1,162 +1,245 @@
+import { useEffect, useRef, useState, ReactNode } from 'react'
 import { setUi } from '../../sim/store'
+
+function useScrollReveal() {
+  const ref = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setVisible(true)
+      }
+    }, { threshold: 0.3 })
+    if (ref.current) observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [])
+  return { ref, visible }
+}
+
+function ScrollSection({ children, className = '' }: { children: ReactNode, className?: string }) {
+  const { ref, visible } = useScrollReveal()
+  return (
+    <div ref={ref} className={`mc-scroll-section ${visible ? 'visible' : ''} ${className}`}>
+      {children}
+    </div>
+  )
+}
 
 export function PdrPage() {
   return (
-    <div className="mc-page-container">
-      <div className="mc-hero-section">
+    <div className="mc-page-container pdr-story">
+      {/* PAGE HERO */}
+      <div className="mc-hero-section compact-hero">
         <div className="mc-eyebrow">
           <span className="mc-eyebrow-dot" aria-hidden="true" />
           <span>INERTIAL PEDESTRIAN DEAD RECKONING</span>
         </div>
         <h1 className="mc-hero-title">
-          The phone doesn't need to see the path.<br/> <span className="mc-hero-em">It can feel it.</span>
+          Your phone can feel <span className="mc-hero-em">the path.</span>
         </h1>
         <p className="mc-hero-deck">
-          LodeStone reconstructs your movement from onboard motion sensors while the phone remains in your pocket. No GPS, no cameras, no scanning.
+          Park Trace reconstructs your walking route using onboard motion sensors while the phone remains in your pocket. No GPS. No camera. No special handling.
         </p>
       </div>
-      
-      {/* PDR Pipeline Infographic */}
-      <div className="mc-insight-section mc-pipeline-section">
-        <div className="mc-pipeline-graphic">
-          <div className="mc-pipeline-node">
-            <div className="mc-pipeline-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-            </div>
-            <div className="mc-pipeline-text">
-              <h4>Accelerometer</h4>
-            </div>
+
+      {/* WE DON'T NEED TO KNOW NORTH (combining hero visual and relative heading concept) */}
+      <ScrollSection className="mc-insight-section compact-section">
+        <div className="mc-side-by-side">
+          <div className="mc-sbs-text">
+            <h2 className="mc-section-title">We don't need to know north.</h2>
+            <p className="mc-section-desc">
+              Park Trace doesn't need absolute GPS coordinates. By using the Game Rotation Vector, it primarily tracks your relative movement from the starting point.
+            </p>
           </div>
-          <div className="mc-pipeline-arrow">&darr;</div>
-          
-          <div className="mc-pipeline-node">
-            <div className="mc-pipeline-icon">
-               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
-            </div>
-            <div className="mc-pipeline-text">
-              <h4>Step Detection</h4>
-            </div>
+          <div className="mc-sbs-visual compact-visual">
+            <svg viewBox="0 0 160 100" className="compact-relative-svg" style={{width: '100%', maxWidth: '200px'}}>
+              <circle cx="40" cy="80" r="5" fill="#141413" />
+              <text x="52" y="84" fontSize="10" fill="#6d7480" fontWeight="600">START</text>
+              <path className="relative-path" d="M 40 80 L 40 30 L 120 30" fill="none" stroke="#F37338" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <circle className="relative-end-dot" cx="120" cy="30" r="5" fill="#CF4500" />
+            </svg>
           </div>
-          <div className="mc-pipeline-arrow">&darr;</div>
-          
-          <div className="mc-pipeline-node">
-            <div className="mc-pipeline-icon">
-               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+        </div>
+      </ScrollSection>
+
+      {/* STEPS BECOME A PATH */}
+      <ScrollSection className="mc-insight-section compact-section">
+        <h2 className="mc-section-title">Steps become a path.</h2>
+        <p className="mc-section-desc">
+          Using just the accelerometer, we detect the impact of each step and estimate your stride length.
+        </p>
+        <div className="mc-graphic-panel compact-panel">
+          <div className="horizontal-flow-diagram">
+            <div className="hf-node accel">
+              <span>ACCELEROMETER</span>
             </div>
-            <div className="mc-pipeline-text">
-              <h4>Stride Estimation</h4>
+            <div className="hf-line"><div className="hf-dot d1" /></div>
+            <div className="hf-node step">
+              <span>STEP</span>
             </div>
-          </div>
-          <div className="mc-pipeline-arrow">&darr;</div>
-          
-          <div className="mc-pipeline-node">
-            <div className="mc-pipeline-icon">
-               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+            <div className="hf-line"><div className="hf-dot d2" /></div>
+            <div className="hf-node stride">
+              <span>STRIDE</span>
             </div>
-            <div className="mc-pipeline-text">
-              <h4>Relative Heading</h4>
+            <div className="hf-line"><div className="hf-dot d3" /></div>
+            <div className="hf-node heading">
+              <span>HEADING</span>
             </div>
-          </div>
-          <div className="mc-pipeline-arrow">&darr;</div>
-          
-          <div className="mc-pipeline-node highlight">
-            <div className="mc-pipeline-icon">
-               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>
-            </div>
-            <div className="mc-pipeline-text">
-              <h4>Route Reconstruction</h4>
+            <div className="hf-line"><div className="hf-dot d4" /></div>
+            <div className="hf-node pdr highlight">
+              <span>PDR</span>
             </div>
           </div>
         </div>
-      </div>
+      </ScrollSection>
 
-      {/* Grid Correction Insight */}
-      <div className="mc-insight-section mc-grid-correction">
-        <h2 className="mc-section-title">We don't need absolute north.</h2>
+      {/* GARAGE GEOMETRY */}
+      <ScrollSection className="mc-insight-section compact-section">
+        <h2 className="mc-section-title">The garage has a geometry.</h2>
         <p className="mc-section-desc">
-          We care about relative movement from the parking location, not your absolute GPS coordinates.
-          The garage already has a geometry. We use it.
+          Parking garages are generally structured around corridors and 90-degree turns. We snap the raw, slightly noisy sensor path to this grid.
         </p>
-        
-        <div className="mc-graphic-panel">
-          <div className="mc-grid-viz">
+        <div className="mc-graphic-panel compact-panel">
+          <div className="mc-grid-viz-compact">
             <div className="mc-viz-col">
-              <h5>Raw Sensor Path</h5>
-              <svg viewBox="0 0 100 100" className="mc-noisy-path">
-                 <path d="M10 90 L12 85 L9 75 L15 70 L13 60 L18 55 L20 40 L30 38 L35 42 L50 35 L60 38 L75 30 L85 35 L90 20" fill="none" stroke="#6d7480" strokeWidth="2" strokeLinejoin="round"/>
-                 <circle cx="10" cy="90" r="3" fill="#CF4500" />
-                 <circle cx="90" cy="20" r="3" fill="#6d7480" />
+              <h5>Raw Path</h5>
+              <svg viewBox="0 0 100 80" className="mc-noisy-path-small">
+                 <path className="raw-path-anim" d="M10 70 L12 65 L9 55 L15 50 L13 40 L18 35 L20 20 L30 18 L35 22 L50 15 L60 18 L75 10 L85 15 L90 5" fill="none" stroke="#6d7480" strokeWidth="1.5" strokeLinejoin="round"/>
+                 <circle cx="10" cy="70" r="2.5" fill="#CF4500" />
+                 <circle cx="90" cy="5" r="2.5" fill="#6d7480" />
               </svg>
             </div>
             <div className="mc-viz-arrow">&rarr;</div>
             <div className="mc-viz-col">
-              <h5>Grid-Corrected Path</h5>
-              <svg viewBox="0 0 100 100" className="mc-clean-path">
-                 <path d="M10 90 L10 40 L90 40 L90 20" fill="none" stroke="#F37338" strokeWidth="3" strokeLinejoin="miter"/>
-                 <circle cx="10" cy="90" r="3" fill="#CF4500" />
-                 <circle cx="90" cy="20" r="3" fill="#141413" />
+              <h5>Grid-Corrected</h5>
+              <svg viewBox="0 0 100 80" className="mc-clean-path-small">
+                 <path className="grid-path-anim" d="M10 70 L10 20 L90 20 L90 5" fill="none" stroke="#F37338" strokeWidth="2.5" strokeLinejoin="miter"/>
+                 <circle cx="10" cy="70" r="2.5" fill="#CF4500" />
+                 <circle className="grid-dot-anim" cx="90" cy="5" r="2.5" fill="#141413" />
               </svg>
             </div>
           </div>
         </div>
-      </div>
+      </ScrollSection>
 
-      {/* Pocket Positioning */}
-      <div className="mc-insight-section mc-pocket-positioning">
-        <h2 className="mc-section-title">No pointing. No scanning.<br/>Just walk.</h2>
+      {/* MAGNETIC FINGERPRINT & DTW */}
+      <ScrollSection className="mc-insight-section compact-section">
+        <h2 className="mc-section-title">A place leaves a magnetic signature.</h2>
         <p className="mc-section-desc">
-          There's no need to hold the phone in front of you. By fusing accelerometer and gyroscope data dynamically, the system compensates for how the phone bounces and rotates inside your pocket or bag.
+          Steel structures distort the magnetic field, providing a spatial fingerprint. Dynamic Time Warping aligns your return trace to this stored route, even if you walk at a different speed.
         </p>
-      </div>
-
-      {/* Magnetic Fingerprint Insight */}
-      <div className="mc-insight-section mc-magnetic-fingerprint">
-        <h2 className="mc-section-title">The magnetometer is a terrible compass.<br/><span className="mc-hero-em">That's exactly why we use it differently.</span></h2>
-        <p className="mc-section-desc">
-          Steel structures, reinforcement, and vehicles distort the local magnetic field. That makes the magnetometer unreliable as a traditional compass. But those distortions can act as a spatial fingerprint.
-        </p>
-
-        <div className="mc-dtw-visualization">
-          <div className="mc-dtw-row">
-            <span className="mc-dtw-label">STORED ROUTE</span>
-            <svg viewBox="0 0 400 40" className="mc-dtw-wave">
-              <path d="M 0 20 Q 20 5, 40 20 T 80 20 Q 90 35, 100 20 T 140 20 Q 160 0, 180 20 T 220 20 Q 230 30, 240 20 T 280 20 Q 300 5, 320 20 T 360 20 Q 380 35, 400 20" fill="none" stroke="#CF4500" strokeWidth="2"/>
-            </svg>
-          </div>
-          
-          <div className="mc-dtw-alignments">
-            <svg viewBox="0 0 400 30" preserveAspectRatio="none">
-              {/* Dynamic Time Warping alignment lines */}
-              <line x1="40" y1="0" x2="60" y2="30" stroke="#d1d5db" strokeWidth="1" strokeDasharray="2 2" />
-              <line x1="100" y1="0" x2="110" y2="30" stroke="#d1d5db" strokeWidth="1" strokeDasharray="2 2" />
-              <line x1="180" y1="0" x2="200" y2="30" stroke="#d1d5db" strokeWidth="1" strokeDasharray="2 2" />
-              <line x1="240" y1="0" x2="240" y2="30" stroke="#d1d5db" strokeWidth="1" strokeDasharray="2 2" />
-              <line x1="320" y1="0" x2="340" y2="30" stroke="#d1d5db" strokeWidth="1" strokeDasharray="2 2" />
+        <div className="mc-graphic-panel compact-panel fingerprint-dtw-panel">
+           <div className="fingerprint-label">GARAGE PATH</div>
+           <svg viewBox="0 0 300 15" className="fingerprint-path-svg">
+              <line className="fp-line" x1="0" y1="8" x2="300" y2="8" stroke="#141413" strokeWidth="1.5" />
+              <circle className="fp-dot" cx="0" cy="8" r="3" fill="#CF4500" />
+              <circle className="fp-dot" cx="75" cy="8" r="3" fill="#CF4500" />
+              <circle className="fp-dot" cx="150" cy="8" r="3" fill="#CF4500" />
+              <circle className="fp-dot" cx="225" cy="8" r="3" fill="#CF4500" />
+              <circle className="fp-dot" cx="300" cy="8" r="3" fill="#CF4500" />
+           </svg>
+           <div className="fingerprint-label fp-mt">OUTBOUND SIGNATURE</div>
+           <svg viewBox="0 0 300 24" className="fingerprint-wave-svg">
+              <path className="dtw-wave-1" d="M 0 12 Q 15 0, 30 12 T 60 12 Q 80 24, 90 12 T 120 12 Q 140 6, 160 12 T 190 12 Q 210 21, 230 12 T 260 12 Q 280 3, 300 12" fill="none" stroke="#CF4500" strokeWidth="1.5" />
+           </svg>
+           
+           <div className="mc-dtw-alignments compact-align">
+            <svg viewBox="0 0 300 16" preserveAspectRatio="none">
+              <line className="dtw-line" x1="30" y1="0" x2="45" y2="16" stroke="#d1d5db" strokeWidth="1" strokeDasharray="2 2" />
+              <line className="dtw-line" x1="90" y1="0" x2="100" y2="16" stroke="#d1d5db" strokeWidth="1" strokeDasharray="2 2" />
+              <line className="dtw-line" x1="160" y1="0" x2="175" y2="16" stroke="#d1d5db" strokeWidth="1" strokeDasharray="2 2" />
+              <line className="dtw-line" x1="230" y1="0" x2="230" y2="16" stroke="#d1d5db" strokeWidth="1" strokeDasharray="2 2" />
+              <line className="dtw-line" x1="300" y1="0" x2="300" y2="16" stroke="#d1d5db" strokeWidth="1" strokeDasharray="2 2" />
             </svg>
           </div>
 
-          <div className="mc-dtw-row">
-            <span className="mc-dtw-label">RETURN WALK</span>
-            <svg viewBox="0 0 400 40" className="mc-dtw-wave return">
-              <path d="M 0 20 Q 30 5, 60 20 T 90 20 Q 100 35, 110 20 T 150 20 Q 175 0, 200 20 T 230 20 Q 235 30, 240 20 T 290 20 Q 315 5, 340 20 T 370 20 Q 385 35, 400 20" fill="none" stroke="#141413" strokeWidth="2"/>
-            </svg>
-          </div>
-          
-          <div className="mc-dtw-caption">
-            <strong>Dynamic Time Warping (DTW)</strong> alignment. You don't have to walk at exactly the same speed to recognize the same path.
+          <div className="fingerprint-label fp-mt-0">RETURN SIGNATURE</div>
+           <svg viewBox="0 0 300 24" className="fingerprint-wave-svg">
+              <path className="dtw-wave-2" d="M 0 12 Q 22.5 0, 45 12 T 90 12 Q 95 24, 100 12 T 150 12 Q 162.5 6, 175 12 T 215 12 Q 222.5 21, 230 12 T 265 12 Q 282.5 3, 300 12" fill="none" stroke="#141413" strokeWidth="1.5" />
+           </svg>
+        </div>
+      </ScrollSection>
+
+      {/* THE MAIN TECHNICAL FLOW */}
+      <ScrollSection className="mc-insight-section compact-section">
+        <h2 className="mc-section-title">The localization pipeline.</h2>
+        <div className="mc-graphic-panel pipeline-panel">
+          <div className="arch-flow">
+            <div className="arch-streams">
+              <div className="arch-stream pdr-stream">
+                <div className="arch-node">PDR</div>
+                <div className="arch-pipe" />
+                <div className="arch-node outline">Route Estimate</div>
+                <div className="arch-pipe bottom-elbow">
+                  <div className="pipe-flow-dot" />
+                </div>
+              </div>
+              <div className="arch-stream mag-stream">
+                <div className="arch-node">MAGNETIC FINGERPRINT</div>
+                <div className="arch-pipe" />
+                <div className="arch-node outline">Sequence Match</div>
+                <div className="arch-pipe bottom-elbow-left">
+                  <div className="pipe-flow-dot delay-1" />
+                </div>
+              </div>
+            </div>
+            <div className="arch-merge-point">
+               <div className="arch-node highlight drift-corr-node">
+                 DRIFT CORRECTION
+               </div>
+               <div className="arch-pipe vertical">
+                 <div className="pipe-flow-dot delay-2" />
+               </div>
+               <div className="arch-node final-node">POSITION ALONG ROUTE</div>
+            </div>
+
+            <div className="drift-anim-visual">
+              <svg viewBox="0 0 200 40">
+                <path className="drift-path" d="M 20 20 Q 50 5, 100 20" fill="none" stroke="#6d7480" strokeWidth="1.5" strokeDasharray="2 2" />
+                <path className="correct-path" d="M 100 20 Q 150 35, 180 20" fill="none" stroke="#F37338" strokeWidth="2" />
+                <circle className="drift-dot" cx="100" cy="20" r="3" fill="#141413" />
+              </svg>
+            </div>
           </div>
         </div>
-      </div>
+      </ScrollSection>
 
-      <div className="mc-page-footer">
-        <p className="mc-footer-tagline">Your phone remembers the walk.</p>
-        <button className="mc-btn-primary" onClick={() => setUi({ route: 'floors' })}>
-          <span>Next: Multi-Floor Tracking</span>
+      {/* PHONE-IN-POCKET SECTION */}
+      <ScrollSection className="mc-insight-section compact-section mc-pocket-positioning">
+        <div className="mc-side-by-side">
+          <div className="mc-sbs-text">
+            <h2 className="mc-section-title">No pointing.<br/>No scanning.<br/>Just walk.</h2>
+            <p className="mc-section-desc">
+              The phone stays in your pocket. Fusing accelerometer and gyroscope data dynamically compensates for how it bounces and rotates.
+            </p>
+          </div>
+          <div className="mc-sbs-visual compact-visual pocket-visual-compact">
+             <svg viewBox="0 0 150 100" className="pocket-svg-small">
+                <circle cx="75" cy="50" r="25" fill="rgba(20,20,19,0.02)" stroke="rgba(20,20,19,0.1)" strokeWidth="1" strokeDasharray="2 2" />
+                <rect x="65" y="30" width="20" height="40" rx="3" fill="#141413" />
+                <circle cx="75" cy="50" r="6" fill="#F37338" className="pulse-circle" />
+                <path className="pocket-signal" d="M 10 50 Q 42 20, 75 50 T 140 50" fill="none" stroke="#F37338" strokeWidth="1.5" strokeDasharray="3 3" />
+             </svg>
+          </div>
+        </div>
+      </ScrollSection>
+
+      {/* FINAL SECTION */}
+      <ScrollSection className="mc-page-footer final-section-compact">
+        <div style={{flex: 1}}>
+            <p className="mc-footer-tagline">
+            Your phone doesn't need to see the path.<br/>
+            It can remember how you moved through it.
+            </p>
+        </div>
+        <button className="mc-btn-primary compact-btn" onClick={() => setUi({ route: 'floors' })}>
+          <span>Explore 3-Floor Deck</span>
           <svg width="18" height="18" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M3 8h9m0 0L8.5 4.5M12 8l-3.5 3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
-      </div>
+      </ScrollSection>
     </div>
   )
 }
+

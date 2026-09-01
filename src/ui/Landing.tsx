@@ -20,31 +20,12 @@ export function Landing() {
     <div className="mc-landing">
       {/* Ghost watermark background typography */}
       <div className="mc-watermark" aria-hidden="true">
-        LODESTONE NAVIGATION
+        PARK TRACE NAVIGATION
       </div>
 
-      {/* Floating Header with Open LodeStone Wordmark & Navigation */}
-      <header className="mc-header-row" aria-label="Header">
-        <div className="mc-brand-open">
-          <span className="mc-brand-title">LodeStone</span>
-        </div>
+      {/* Floating Header with Open Park Trace Logo & Navigation */}
+      <Header />
 
-        <nav className="mc-nav-pill" aria-label="Main Navigation">
-          <div className="mc-nav-links">
-            <button type="button" className="mc-nav-link active">Overview</button>
-            <button type="button" className="mc-nav-link">Inertial PDR</button>
-            <button type="button" className="mc-nav-link">3-Floor Deck</button>
-            <button type="button" className="mc-nav-link">Technology</button>
-          </div>
-
-          <div className="mc-nav-actions">
-            <div className="mc-status-pill">
-              <span className="mc-pulse-dot" aria-hidden="true" />
-              <span>Interactive Demo</span>
-            </div>
-          </div>
-        </nav>
-      </header>
 
       {/* Main Content Area */}
       <div className="mc-landing-content">

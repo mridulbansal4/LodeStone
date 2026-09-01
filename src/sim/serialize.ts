@@ -41,7 +41,8 @@ export function loadRun(json: string): boolean {
   }
 }
 
-const KEY = 'lodestone:last-run'
+const KEY = 'parktrace:last-run'
+const LEGACY_KEY = 'lodestone:last-run'
 
 export function saveLocal() {
   try {
@@ -54,7 +55,7 @@ export function saveLocal() {
 
 export function loadLocal(): boolean {
   try {
-    const raw = localStorage.getItem(KEY)
+    const raw = localStorage.getItem(KEY) || localStorage.getItem(LEGACY_KEY)
     return raw ? loadRun(raw) : false
   } catch {
     return false

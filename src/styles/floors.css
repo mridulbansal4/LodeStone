@@ -1,0 +1,271 @@
+/* Floors Page specific styles */
+.mc-scroll-story {
+  display: flex;
+  position: relative;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.mc-scroll-visual {
+  position: sticky;
+  top: 10vh;
+  flex: 1;
+  height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mc-scroll-text {
+  flex: 1;
+  padding-bottom: 20vh;
+  padding-top: 10vh;
+  display: flex;
+  flex-direction: column;
+  gap: 30vh;
+}
+
+.mc-story-step {
+  background: var(--mc-white);
+  padding: 24px 32px;
+  border-radius: var(--mc-r-card);
+  box-shadow: 0 4px 16px rgba(20, 20, 19, 0.04);
+  border: 1px solid rgba(20, 20, 19, 0.05);
+  opacity: 0.2;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  transform: translateY(20px);
+}
+
+.mc-story-step.is-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mc-step-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.mc-step-number {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--mc-signal-orange);
+  line-height: 1;
+}
+
+.mc-step-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--mc-granite);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.mc-step-content h3 {
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--mc-ink-black);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.mc-step-content p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--mc-granite);
+  line-height: 1.5;
+}
+
+.mc-step-detail {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(20, 20, 19, 0.05);
+}
+
+@media (max-width: 768px) {
+  .mc-scroll-story {
+    flex-direction: column;
+    gap: 0;
+  }
+  .mc-scroll-visual {
+    position: sticky;
+    top: 60px;
+    height: 45vh;
+    width: 100%;
+    z-index: 10;
+    background: var(--mc-canvas-cream);
+    border-bottom: 1px solid rgba(20,20,19,0.05);
+  }
+  .mc-scroll-text {
+    padding-top: 5vh;
+    width: 100%;
+    gap: 20vh;
+  }
+  .mc-story-step {
+    padding: 20px;
+  }
+}
+
+/* Isometric Diagram */
+.mc-isometric-deck {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  perspective: 1200px;
+}
+
+.mc-iso-layer {
+  position: absolute;
+  width: 100%;
+  height: 110px;
+  transform-style: preserve-3d;
+  display: flex;
+  align-items: flex-end;
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.7s ease, filter 0.7s ease;
+}
+
+.mc-iso-floor {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.06));
+}
+
+.mc-iso-label {
+  position: absolute;
+  left: -40px;
+  bottom: 25px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--mc-slate-gray);
+  transform: translateZ(20px) rotateZ(-45deg) rotateX(-60deg);
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Vertical Elevator Axis */
+.mc-vertical-axis {
+  position: absolute;
+  right: 58px;
+  bottom: -90px;
+  width: 1px;
+  height: 260px;
+  background: var(--mc-dust-taupe);
+  transform: rotateZ(-45deg) rotateX(-60deg);
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  z-index: 0;
+}
+
+.mc-elevator-car {
+  position: absolute;
+  right: 53px;
+  bottom: 0px;
+  width: 10px;
+  height: 12px;
+  background: var(--mc-signal-orange);
+  transform: rotateZ(-45deg) rotateX(-60deg);
+  opacity: 0;
+  transition: bottom 1.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+  box-shadow: 0 0 8px rgba(243,115,56,0.3);
+}
+
+.mc-iso-path {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  transition: stroke-dashoffset 1s ease-in-out;
+}
+
+.mc-mall-dot, .mc-step-dot, .mc-car {
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.mc-iso-dtw-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  background: rgba(255,255,255,0.95);
+  border-radius: var(--mc-r-card);
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(20, 20, 19, 0.08);
+  border: 1px solid rgba(20, 20, 19, 0.05);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease-in-out;
+  z-index: 10;
+}
+
+/* Animations for Step 1: Park (Compact) */
+.step-1 .mc-layer-l1 { transform: translateY(-15px) rotateX(60deg) rotateZ(45deg); z-index: 4; }
+.step-1 .mc-layer-b1 { transform: translateY(-5px) rotateX(60deg) rotateZ(45deg); z-index: 3; }
+.step-1 .mc-layer-b2 { transform: translateY(5px) rotateX(60deg) rotateZ(45deg); z-index: 2; }
+.step-1 .mc-layer-b3 { transform: translateY(15px) rotateX(60deg) rotateZ(45deg); z-index: 1; }
+.step-1 .mc-layer-l1, .step-1 .mc-layer-b1, .step-1 .mc-layer-b2 { opacity: 0.15; }
+.step-1 .mc-layer-b3 { opacity: 1; }
+.step-1 .mc-car { opacity: 1; }
+
+/* Step 2: Walk (B3 Route) */
+.step-2 .mc-layer-l1 { transform: translateY(-15px) rotateX(60deg) rotateZ(45deg); z-index: 4; }
+.step-2 .mc-layer-b1 { transform: translateY(-5px) rotateX(60deg) rotateZ(45deg); z-index: 3; }
+.step-2 .mc-layer-b2 { transform: translateY(5px) rotateX(60deg) rotateZ(45deg); z-index: 2; }
+.step-2 .mc-layer-b3 { transform: translateY(15px) rotateX(60deg) rotateZ(45deg); z-index: 1; }
+.step-2 .mc-layer-l1, .step-2 .mc-layer-b1, .step-2 .mc-layer-b2 { opacity: 0.15; }
+.step-2 .mc-layer-b3 { opacity: 1; }
+.step-2 .mc-car, .step-2 .mc-step-dot { opacity: 1; }
+.step-2 .out-path-b3 { stroke-dashoffset: 0; }
+.step-2 .mc-step-dot:nth-child(1) { transition-delay: 0.3s; }
+.step-2 .mc-step-dot:nth-child(2) { transition-delay: 0.6s; }
+
+/* Step 3: Elevation (Explode) */
+.step-3 .mc-layer-l1 { transform: translateY(-110px) rotateX(60deg) rotateZ(45deg); z-index: 4; }
+.step-3 .mc-layer-b1 { transform: translateY(-40px) rotateX(60deg) rotateZ(45deg); z-index: 3; }
+.step-3 .mc-layer-b2 { transform: translateY(30px) rotateX(60deg) rotateZ(45deg); z-index: 2; }
+.step-3 .mc-layer-b3 { transform: translateY(100px) rotateX(60deg) rotateZ(45deg); z-index: 1; }
+.step-3 .mc-layer-l1, .step-3 .mc-layer-b1, .step-3 .mc-layer-b2, .step-3 .mc-layer-b3 { opacity: 1; }
+.step-3 .mc-car { opacity: 1; }
+.step-3 .out-path-b3 { stroke-dashoffset: 0; }
+.step-3 .mc-iso-label { opacity: 1; }
+.step-3 .mc-vertical-axis { opacity: 0.4; }
+.step-3 .mc-elevator-car { opacity: 1; bottom: 85px; } /* Moving up */
+
+/* Step 4: Route Memory */
+.step-4 .mc-layer-l1 { transform: translateY(-110px) rotateX(60deg) rotateZ(45deg); z-index: 4; }
+.step-4 .mc-layer-b1 { transform: translateY(-40px) rotateX(60deg) rotateZ(45deg); z-index: 3; }
+.step-4 .mc-layer-b2 { transform: translateY(30px) rotateX(60deg) rotateZ(45deg); z-index: 2; }
+.step-4 .mc-layer-b3 { transform: translateY(100px) rotateX(60deg) rotateZ(45deg); z-index: 1; }
+.step-4 .mc-layer-l1, .step-4 .mc-layer-b1, .step-4 .mc-layer-b2, .step-4 .mc-layer-b3 { opacity: 1; }
+.step-4 .mc-car { opacity: 1; }
+.step-4 .out-path-b3, .step-4 .out-path-l1 { stroke-dashoffset: 0; }
+.step-4 .mc-mall-dot { opacity: 1; }
+.step-4 .mc-iso-label { opacity: 1; }
+.step-4 .mc-vertical-axis { opacity: 0.4; }
+.step-4 .mc-elevator-car { opacity: 1; bottom: 85px; }
+
+/* Step 5: Return / DTW Match */
+.step-5 .mc-layer-l1 { transform: translateY(-110px) rotateX(60deg) rotateZ(45deg); z-index: 4; }
+.step-5 .mc-layer-b1 { transform: translateY(-40px) rotateX(60deg) rotateZ(45deg); z-index: 3; }
+.step-5 .mc-layer-b2 { transform: translateY(30px) rotateX(60deg) rotateZ(45deg); z-index: 2; }
+.step-5 .mc-layer-b3 { transform: translateY(100px) rotateX(60deg) rotateZ(45deg); z-index: 1; }
+.step-5 .mc-layer-l1, .step-5 .mc-layer-b1, .step-5 .mc-layer-b2, .step-5 .mc-layer-b3 { opacity: 0.2; filter: blur(2px); }
+.step-5 .mc-iso-dtw-overlay { opacity: 1; }
+.step-5 .mc-vertical-axis { opacity: 0; }
+
+/* Step 6: Find the Car */
+.step-6 .mc-layer-l1 { transform: translateY(-110px) rotateX(60deg) rotateZ(45deg); z-index: 4; }
+.step-6 .mc-layer-b1 { transform: translateY(-40px) rotateX(60deg) rotateZ(45deg); z-index: 3; }
+.step-6 .mc-layer-b2 { transform: translateY(30px) rotateX(60deg) rotateZ(45deg); z-index: 2; }
+.step-6 .mc-layer-b3 { transform: translateY(100px) rotateX(60deg) rotateZ(45deg); z-index: 1; }
+.step-6 .mc-layer-l1, .step-6 .mc-layer-b1, .step-6 .mc-layer-b2, .step-6 .mc-layer-b3 { opacity: 1; }
+.step-6 .mc-car { opacity: 1; fill: var(--mc-signal-orange); filter: drop-shadow(0 0 10px rgba(243,115,56,0.8)); }
+.step-6 .out-path-b3, .step-6 .out-path-l1 { stroke-dashoffset: 0; opacity: 0.15; }
+.step-6 .return-path-l1, .step-6 .return-path-b3 { stroke-dashoffset: 0; }
+.step-6 .mc-iso-label { opacity: 1; }
+.step-6 .mc-vertical-axis { opacity: 0.4; }
+.step-6 .mc-elevator-car { opacity: 1; bottom: -30px; background: #141413; }
