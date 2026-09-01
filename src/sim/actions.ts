@@ -1,9 +1,29 @@
 import { SIM } from './constants'
 import { sim, resetSim, setPhase, toast } from './state'
 import { CAR, SPAWN } from '../world/maps'
+import { toScreenX, toScreenY } from '../world/iso'
 import { resetMetrics } from './metrics'
 import { buildRoute, startGuidance } from './navigation'
 import { setUi } from './store'
+
+/**
+ * Places the camera over the parked car on B3 without starting the demo, so
+ * the landing page has the real world behind it rather than a flat backdrop.
+ * Records nothing: the phase stays 'landing', so the loop only advances time.
+ */
+export function initPreview() {
+  sim.car = { ...CAR }
+  sim.player.x = SPAWN.x
+  sim.player.y = SPAWN.y
+  sim.player.floor = CAR.floor
+  sim.player.heading = Math.PI / 2
+  // A fixed shot: the car sits right of centre so the copy on the left has a
+  // clean field, and the deck reads behind it.
+  sim.camera.x = toScreenX(CAR.x, CAR.y) - 205
+  sim.camera.y = toScreenY(CAR.x, CAR.y) - 40
+  sim.camera.zoom = 0.95
+  sim.camera.initialised = true
+}
 
 export function startDemo() {
   resetSim()

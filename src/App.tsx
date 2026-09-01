@@ -14,6 +14,7 @@ import {
 } from './ui/WorldOverlays'
 import { installInput } from './ui/input'
 import { startLoop } from './sim/loop'
+import { initPreview } from './sim/actions'
 import { sim } from './sim/state'
 import { useUi, setUi } from './sim/store'
 
@@ -24,6 +25,7 @@ export default function App() {
   const [touch, setTouch] = useState(false)
 
   useEffect(() => {
+    initPreview()
     startLoop()
     const uninstall = installInput()
 

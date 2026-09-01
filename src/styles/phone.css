@@ -126,6 +126,11 @@
   top: 12px;
 }
 
+/* Asleep: a black panel, the way a phone actually looks face-up on a table. */
+.phone-screen.asleep {
+  background: #05070a;
+}
+
 /* ---------- map ---------- */
 
 .phone-map {

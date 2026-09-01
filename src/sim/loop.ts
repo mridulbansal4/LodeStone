@@ -49,7 +49,14 @@ export function stepFrames(n: number) {
 
 function tick(ms: number) {
   const dt = ms / 1000
-  if (sim.phase === 'landing' || sim.ui.paused) return
+  if (sim.ui.paused) return
+
+  // On the landing screen only time moves: the preview scene stays ambient and
+  // nothing is recorded until the demo actually starts.
+  if (sim.phase === 'landing') {
+    sim.time += ms
+    return
+  }
 
   sim.time += ms
 

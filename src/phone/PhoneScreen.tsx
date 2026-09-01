@@ -28,6 +28,9 @@ export function PhoneScreen() {
   const overview = phase === 'routeOverview'
   const ready = distance >= SIM.MEMORY_MIN_DIST
 
+  // State 1 - Landing. The phone is asleep; it wakes when the demo starts.
+  if (phase === 'landing') return <div className="phone-screen asleep" />
+
   return (
     <div className="phone-screen">
       <div className="phone-map">

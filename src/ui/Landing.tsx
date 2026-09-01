@@ -1,44 +1,84 @@
 import { startDemo } from '../sim/actions'
-import { SimBadge } from './SimBadge'
 import { useUi } from '../sim/store'
 
+/**
+ * The landing page. Left-aligned editorial column over the live B3 parking
+ * deck, so the first thing a judge sees is the problem the product solves
+ * rather than a decorative gradient.
+ */
 export function Landing() {
   const phase = useUi((s) => s.phase)
   if (phase !== 'landing') return null
 
   return (
     <div className="landing">
-      <div className="landing-inner">
-        <div className="eyebrow">Parking Memory · Prototype</div>
-        <h1>Your phone remembers the walk, not the pin.</h1>
-        <div className="tagline">Park. Walk away. Find it again.</div>
-        <p className="blurb">
-          GPS dies under a concrete deck, so a dropped pin lands at the ramp. This playable prototype shows
-          what happens when the phone remembers the walk itself instead — recording your route with no
-          action from you, then guiding you back through a multi-floor mall.
+      <div className="landing-col">
+        <div className="masthead">
+          <span className="mark" aria-hidden="true">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M3.5 12.5V8.5h4v-4h4V2"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle cx="3.5" cy="12.5" r="2.1" fill="currentColor" />
+            </svg>
+          </span>
+          <span className="name">Parking Memory</span>
+          <span className="rule" aria-hidden="true" />
+          <span className="kind">Interactive prototype</span>
+        </div>
+
+        <h1>
+          Your phone remembers <em>the walk</em>, not the pin.
+        </h1>
+
+        <p className="deck">
+          GPS dies under a concrete deck, so a dropped pin lands back at the ramp. Walk away from the car
+          here and the phone records the route on its own &mdash; then guides you back through three floors
+          of mall.
         </p>
-        <button className="cta" onClick={startDemo} autoFocus>
-          Start Demo
-        </button>
-        <div className="legend">
-          <span>
-            <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> move
-          </span>
-          <span>
-            <kbd>E</kbd> use lift / stairs
-          </span>
-          <span>
-            <kbd>F</kbd> find my car
-          </span>
-          <span>
-            <kbd>R</kbd> restart
-          </span>
-          <span>
-            <kbd>Esc</kbd> controls
+
+        <div className="actions">
+          <button className="start" onClick={startDemo} autoFocus>
+            Start demo
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                d="M3 8h9m0 0L8.5 4.5M12 8l-3.5 3.5"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <span className="controls">
+            <b>W A S D</b> to move · <b>E</b> for lifts · <b>F</b> to find your car
           </span>
         </div>
-        <SimBadge />
+
+        <ul className="claims">
+          <li>
+            <b>No GPS</b>
+            <span>Works three floors underground</span>
+          </li>
+          <li>
+            <b>No beacons</b>
+            <span>Nothing installed in the venue</span>
+          </li>
+          <li>
+            <b>No camera</b>
+            <span>The phone stays in your pocket</span>
+          </li>
+        </ul>
       </div>
+
+      <p className="disclosure">
+        <i aria-hidden="true" />
+        Simulation. Every figure this prototype shows is derived from the game state, not from a sensor.
+      </p>
     </div>
   )
 }

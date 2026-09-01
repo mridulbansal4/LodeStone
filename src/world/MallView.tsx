@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { render } from './renderer'
 import { updateCamera, nudgeZoom } from './camera'
-import { sim } from '../sim/state'
 
 /**
  * The mall world. Reads `sim` directly inside its own animation frame - it
@@ -37,11 +36,6 @@ export function MallView() {
 
     const frame = () => {
       raf = requestAnimationFrame(frame)
-      if (sim.phase === 'landing') {
-        ctx.fillStyle = '#0B0F1A'
-        ctx.fillRect(0, 0, w, h)
-        return
-      }
       updateCamera()
       render(ctx, w, h)
     }

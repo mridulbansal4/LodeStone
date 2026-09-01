@@ -7,6 +7,9 @@ import { toScreenX, toScreenY } from './iso'
  * jittering when the player taps a direction key.
  */
 export function updateCamera() {
+  // The landing screen frames a fixed shot; it must not follow anything.
+  if (sim.phase === 'landing') return
+
   const tx = toScreenX(sim.player.x, sim.player.y)
   const ty = toScreenY(sim.player.x, sim.player.y)
 
