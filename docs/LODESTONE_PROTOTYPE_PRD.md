@@ -127,8 +127,8 @@ Polished, playful, premium, futuristic. Flat-shaded isometric geometry with soft
 ### 4.2 Camera
 
 - Isometric-style ortho projection, fixed 2:1 tile ratio.
-- Smooth follow with damping: `camera.pos += (target - camera.pos) * 0.12` per frame at 60 fps. **[Assumption]**
-- Dead-zone of 48 px around the avatar so micro-movements do not jitter the frame.
+- Smooth follow with damping: `camera.pos += (target - camera.pos) * 0.2` per frame at 60 fps. **[Assumption]**
+- Dead-zone of 16 px around the avatar so micro-movements do not jitter the frame. Larger values read as camera lag.
 - Zoom: mouse wheel / pinch, clamped to `0.6×–1.6×`, default `1.0×`. Zoom-to-fit on Route Overview.
 - Camera never rotates. One orientation keeps the world readable and the tile art cheap.
 
@@ -389,9 +389,10 @@ This satisfies the phone-first requirement using the same code path and the same
 
 | Constant | Value | Note |
 |---|---|---|
-| `WALK_SPEED` | `2.8 m/s` | Brisk enough to keep the demo moving, short of the 3.2 that read as a jog **[Assumption]** |
+| `WALK_SPEED` | `3.4 m/s` | Tuned by feel alongside `MOVE_RESPONSE` **[Assumption]** |
 | `SLOW_SPEED` | `0.8 m/s` | Shift held |
-| `ACCEL` | `18 m/s²` | Snappy but not instant |
+| `ACCEL` | `18 m/s²` | Legacy; superseded by `MOVE_RESPONSE` |
+| `MOVE_RESPONSE` | `0.06 s` | Velocity response time. Must NOT be derived from `WALK_SPEED`: the original lerp was `ACCEL * dt / WALK_SPEED`, so raising the top speed stretched the ramp and made the controls feel *slower* |
 | `PLAYER_RADIUS` | `0.35 m` | Collision circle |
 
 Input is normalised so diagonal movement is not faster.
@@ -484,7 +485,7 @@ In Route Overview (before guidance starts) confidence displays **High** by defin
 
 ```js
 export const SIM = {
-  WALK_SPEED: 2.8, SLOW_SPEED: 0.8, ACCEL: 18, PLAYER_RADIUS: 0.35,
+  WALK_SPEED: 3.4, SLOW_SPEED: 0.8, ACCEL: 18, MOVE_RESPONSE: 0.06, PLAYER_RADIUS: 0.35,
   TRAIL_SAMPLE_DIST: 1.5, TRAIL_SAMPLE_TIME: 400, MAX_SAMPLES: 4000,
   STRIDE_M: 0.72, FLOOR_TRANSITION_DIST: 6,
   TURN_THRESHOLD_DEG: 55, TURN_WINDOW_MS: 1200, TURN_COOLDOWN_MS: 1000,
@@ -493,7 +494,7 @@ export const SIM = {
   RECOVER_DIST: 4, RECOVER_HOLD_MS: 600,
   ARRIVE_DIST: 3.5, ARRIVE_HOLD_MS: 400,
   WALK_BACK_SPEED: 1.2,
-  CAMERA_LERP: 0.12, ZOOM_MIN: 0.6, ZOOM_MAX: 1.6,
+  CAMERA_LERP: 0.2, CAMERA_DEADZONE_PX: 16, ZOOM_MIN: 0.6, ZOOM_MAX: 1.6,
   HEADING_EMA: 0.25, CONFIDENCE_EMA: 0.15,
 }
 ```
@@ -996,7 +997,7 @@ Every judgement call made in this document, in one place. All are reversible.
 | A1 | Three floors (B3 / L1 / L2); L3 cut as cost without narrative gain | §5.2 |
 | A2 | 120 × 90 m grid per floor, 64 × 32 px iso tiles | §5.1 |
 | A3 | Camera damping 0.12/frame, no rotation, zoom 0.6–1.6× | §4.2 |
-| A4 | `WALK_SPEED = 2.8 m/s` - tuned by feel over several passes | §7.2 |
+| A4 | `WALK_SPEED = 3.4 m/s` with a 0.06 s response, tuned by feel | §7.2 |
 | A5 | `STRIDE_M = 0.72` fixed (the real product estimates per-user) | §7.5 |
 | A6 | `FLOOR_TRANSITION_DIST = 6 m` added per floor change | §7.4 |
 | A7 | Off-route 8 m / recover 4 m with hold timers; final values tuned in rehearsal | §7.10 |
