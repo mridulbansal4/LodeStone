@@ -1,18 +1,20 @@
 import { PhoneScreen } from './PhoneScreen'
+import { OriginHomeScreen } from './OriginHomeScreen'
 import { useUi } from '../sim/store'
 
 /**
  * iQOO 15 Flagship Smartphone Frame.
  *
- * Modeled strictly after official specifications:
- * - Proportions: 163.65 mm x 76.80 mm x ~8.14-8.28 mm
- * - 6.85" Flat AMOLED display with ~22:10 aspect ratio (1440 x 3168)
- * - Symmetrical hairline bezel
- * - Centered optical punch-hole selfie camera
- * - CNC machined dark aluminium frame with volume rocker & power key
+ * In Landing Phase: Renders the 3D showcase mockup with OriginOS 6 & Park Trace app.
+ * In Demo Phases: Renders the physical iQOO 15 chassis with live PDR navigation simulator.
  */
 export function PhoneFrame() {
   const mobile = useUi((s) => s.mobile)
+  const phase = useUi((s) => s.phase)
+
+  if (phase === 'landing') {
+    return <OriginHomeScreen />
+  }
 
   if (mobile) {
     return (

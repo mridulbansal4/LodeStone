@@ -88,6 +88,8 @@ button {
   box-shadow: none;
   position: relative;
   z-index: 45;
+  flex: 0 0 clamp(360px, 31vw, 480px);
+  padding: 16px 20px;
 }
 
 .app.phase-landing .device-body {

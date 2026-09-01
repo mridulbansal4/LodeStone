@@ -89,6 +89,111 @@
   box-shadow: inset 0 0 1px rgba(130, 180, 255, 0.6);
 }
 
+/* ---------- iQOO 15 Showcase Mockup (Landing Page) ---------- */
+
+.iqoo-mockup-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.iqoo-mockup-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 24px 44px rgba(20, 20, 19, 0.22)) drop-shadow(0 6px 14px rgba(20, 20, 19, 0.12));
+}
+
+.iqoo-mockup-img {
+  width: 100%;
+  height: auto;
+  max-height: clamp(480px, 78vh, 740px);
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+.iqoo-mockup-glass {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  border-radius: 36px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 20%,
+    rgba(255, 255, 255, 0) 50%
+  );
+}
+
+/* Interactive Park Trace Touch Target */
+.iqoo-app-touch-target {
+  position: absolute;
+  top: 59.2%;
+  left: 51.0%;
+  width: 14.8%;
+  height: 13.0%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 18px;
+  outline: none;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.iqoo-app-touch-target:hover {
+  transform: scale(1.08);
+}
+
+.iqoo-app-touch-target:active {
+  transform: scale(0.92);
+}
+
+.iqoo-touch-ripple {
+  position: absolute;
+  inset: -3px;
+  border-radius: 18px;
+  border: 2px solid rgba(243, 115, 56, 0);
+  transition: all 200ms ease;
+  pointer-events: none;
+}
+
+.iqoo-app-touch-target:hover .iqoo-touch-ripple {
+  border-color: rgba(243, 115, 56, 0.85);
+  box-shadow: 0 0 16px rgba(243, 115, 56, 0.65), inset 0 0 8px rgba(243, 115, 56, 0.35);
+}
+
+.iqoo-touch-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  animation: iqooPulse 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes iqooPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(243, 115, 56, 0);
+  }
+  50% {
+    box-shadow: 0 0 12px 2px rgba(243, 115, 56, 0.4);
+  }
+}
+
 /* ---------- OriginOS 6 Ultra-HD Home Screen (iQOO 15) ---------- */
 
 .originos-root {
