@@ -1,15 +1,19 @@
-# Parking Memory — interactive prototype
+# Lodestone — interactive prototype
 
 **Your phone remembers the walk, not the pin.**
 
-A playable web prototype of Parking Memory: park in a multi-floor mall, walk away, and the phone
+A lodestone is naturally magnetised rock — the original compass. The name is literal: in a parking
+garage the magnetic field is far too distorted to point north, but that same distortion is stable
+enough to identify *where you are*. Lodestone throws away the compass and keeps the fingerprint.
+
+A playable web prototype: park in a multi-floor mall, walk away, and the phone
 records the route with no action from you — then guides you back through the building.
 
 Everything the phone displays here is **simulated**. Distance, steps, turns, floor events and
 confidence are derived from a position the engine already knows. No sensors are read, and there is no
 camera, GPS, beacon or network dependency. The real sensor architecture (PDR, magnetic fingerprinting,
 DTW alignment, floor-event classification, auto-trigger) is described in
-[docs/PARKING_MEMORY_PROTOTYPE_PRD.md](docs/PARKING_MEMORY_PROTOTYPE_PRD.md) §17 and belongs to the PPT,
+[docs/LODESTONE_PROTOTYPE_PRD.md](docs/LODESTONE_PROTOTYPE_PRD.md) §17 and belongs to the PPT,
 not to this build.
 
 ## Run it

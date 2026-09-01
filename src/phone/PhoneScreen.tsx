@@ -53,7 +53,7 @@ export function PhoneScreen() {
             <circle cx="3.5" cy="12.5" r="2.1" fill="currentColor" />
           </svg>
         </span>
-        <span className="app-title">Parking Memory</span>
+        <span className="app-title">Lodestone</span>
         <span className="sim-chip" title="No real sensors are used in this prototype">
           SIM
         </span>

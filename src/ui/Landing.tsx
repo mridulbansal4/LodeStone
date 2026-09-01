@@ -26,7 +26,7 @@ export function Landing() {
               <circle cx="3.5" cy="12.5" r="2.1" fill="currentColor" />
             </svg>
           </span>
-          <span className="name">Parking Memory</span>
+          <span className="name">Lodestone</span>
           <span className="rule" aria-hidden="true" />
           <span className="kind">Interactive prototype</span>
         </div>

@@ -41,7 +41,7 @@ export function loadRun(json: string): boolean {
   }
 }
 
-const KEY = 'parking-memory:last-run'
+const KEY = 'lodestone:last-run'
 
 export function saveLocal() {
   try {

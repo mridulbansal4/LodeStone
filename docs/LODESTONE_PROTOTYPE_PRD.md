@@ -1,8 +1,8 @@
-# Parking Memory — Interactive Prototype PRD
+# Lodestone — Interactive Prototype PRD
 
 **Document type:** Implementation PRD for the hackathon prototype
-**Product:** Parking Memory — *Your phone remembers the walk, not the pin.*
-**Deliverable this PRD describes:** a publicly hosted, playable web app that simulates the Parking Memory experience
+**Product:** Lodestone — *Your phone remembers the walk, not the pin.*
+**Deliverable this PRD describes:** a publicly hosted, playable web app that simulates the Lodestone experience
 **Status:** Ready to build
 **Last updated:** 2026-09-01
 
@@ -12,7 +12,9 @@
 
 ## 1. Executive summary
 
-Parking Memory is a product concept for iQOO (Android): the phone automatically remembers the *walk away from your parked car* using on-device motion and magnetic sensing, then guides you back — with no GPS, no beacons, no venue app, no camera, and no user effort.
+Lodestone is a product concept for iQOO (Android): the phone automatically remembers the *walk away from your parked car* using on-device motion and magnetic sensing, then guides you back — with no GPS, no beacons, no venue app, no camera, and no user effort.
+
+The name is the thesis. A lodestone is naturally magnetised rock, the original compass — and in a parking garage the magnetic field is far too distorted to point north, which is exactly what makes it a stable fingerprint of *place* (§17.1).
 
 The **prototype** described here is **not** that product. It is a hosted, interactive web app that lets a judge *play* the experience in a browser in under five minutes. The judge drives a small avatar through a large multi-floor isometric mall while a **simulated smartphone**, rendered beside the world in ordinary web UI, builds a route memory in real time. Later the judge presses **Find My Car**, the phone flips into return-navigation mode, and the judge walks back — including a deliberate wrong turn, an honest off-route warning, a recovery, and a **Car Found** climax.
 
@@ -281,7 +283,7 @@ the content.
 | 9:41              signal  |  status bar, transparent over the map
 |                 wifi batt |
 |  +---------------------+  |
-|  | (o) Parking Memory  |  |  floating top app bar (M3 surface-container-high)
+|  | (o) Lodestone  |  |  floating top app bar (M3 surface-container-high)
 |  |                 SIM |  |
 |  +---------------------+  |
 |  [B3 Parking]  [o Remem.] |  chips over the map
@@ -617,7 +619,7 @@ Minimal and honest — this is the complete list.
 **Office Kit** may be used to mirror or present the laptop/phone during the live pitch. It is **optional and supporting** — the judge's public URL must work with no Office Kit involvement whatsoever.
 
 ```bash
-npm create vite@latest parking-memory -- --template react-ts
+npm create vite@latest lodestone -- --template react-ts
 ```
 
 ```bash
@@ -640,11 +642,11 @@ npm run dev -- --host
 
 **Build:** `npm run build` → `dist/`. No environment variables, no serverless functions, no runtime backend.
 
-**URL:** a short, memorable custom subdomain, e.g. `parking-memory.vercel.app`. Print it as a QR code on the pitch slide so judges reach it in one scan.
+**URL:** a short, memorable custom subdomain, e.g. `lodestone.vercel.app`. Print it as a QR code on the pitch slide so judges reach it in one scan.
 
 **PWA**
 
-- `manifest.webmanifest`: name "Parking Memory", short name "ParkMem", `display: standalone`, portrait orientation, theme colour `#0B0F1A`, 192 / 512 px icons including a maskable variant.
+- `manifest.webmanifest`: name "Lodestone", short name "Lodestone", `display: standalone`, portrait orientation, theme colour `#0B0F1A`, 192 / 512 px icons including a maskable variant.
 - Service worker via `vite-plugin-pwa` (`generateSW`): precache the full app shell — JS, CSS, tile atlas, fonts. After the first load the demo runs **fully offline**, which is the real insurance against venue Wi-Fi.
 - Verify: load once, enable airplane mode, reload — the demo must still play end to end.
 
@@ -673,7 +675,7 @@ npm run dev -- --host
 As built. Where this differs from the structure originally planned, the reason is given in §12.1.
 
 ```
-parking-memory/
+lodestone/
 ├── index.html                     App shell, meta, viewport
 ├── vite.config.ts                 Vite + PWA plugin config
 ├── tsconfig.json                  Strict TS config
@@ -685,7 +687,7 @@ parking-memory/
 │   ├── icons/icon-192.png         PWA icon
 │   └── icons/icon-512.png         PWA icon (also used maskable)
 ├── docs/
-│   └── PARKING_MEMORY_PROTOTYPE_PRD.md   This document
+│   └── LODESTONE_PROTOTYPE_PRD.md   This document
 └── src/
     ├── main.tsx                   React entry, mounts App
     ├── App.tsx                    Layout: world panel + phone panel, responsive swap
@@ -916,7 +918,11 @@ A person with a browser can run this in ten minutes. Every item is pass/fail.
 
 ### 17.1 The core insight
 
-In a parking garage the magnetometer is a **terrible compass and an excellent fingerprint**. Rebar, steel beams, and parked cars distort the local field badly enough to destroy compass headings — but that distortion is *spatially stable*: the same spot reads the same way an hour later. So Parking Memory does two opposite things at once:
+*A lodestone is naturally magnetised rock — the original compass. The product is named for the
+inversion of it: the field is useless for pointing north here, and precisely because of that, useful
+for saying where you are.*
+
+In a parking garage the magnetometer is a **terrible compass and an excellent fingerprint**. Rebar, steel beams, and parked cars distort the local field badly enough to destroy compass headings — but that distortion is *spatially stable*: the same spot reads the same way an hour later. So Lodestone does two opposite things at once:
 
 - **Excludes** the magnetometer from heading entirely — heading comes from `TYPE_GAME_ROTATION_VECTOR` (gyro + accelerometer, no magnetic reference), giving **relative** turns measured from the car.
 - **Uses** the magnetometer as a **1D location fingerprint** along the walked path, aligned on return with Dynamic Time Warping.
