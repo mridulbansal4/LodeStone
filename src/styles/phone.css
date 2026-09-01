@@ -1,0 +1,641 @@
+/* The simulated phone. Drawn with ordinary web UI - not an emulator, not a
+   screen mirror. Pixel-6-class proportions, 360 x 780 logical px. */
+
+.phone-frame {
+  position: relative;
+  width: 360px;
+  height: 780px;
+  max-height: 100%;
+  padding: 11px;
+  border-radius: var(--r-phone);
+  background: linear-gradient(160deg, #262c3d 0%, #14192a 50%, #20263a 100%);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(147, 160, 192, 0.14);
+  flex: 0 0 auto;
+  transform-origin: center center;
+}
+
+.phone-frame::after {
+  content: '';
+  position: absolute;
+  inset: 11px;
+  border-radius: 30px;
+  pointer-events: none;
+  background: linear-gradient(200deg, rgba(255, 255, 255, 0.07) 0%, transparent 38%);
+}
+
+.phone-punch {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #05070d;
+  z-index: 3;
+}
+
+.phone-screen {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  border-radius: 30px;
+  background: var(--bg-surface);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* mobile: the phone IS the viewport, so drop the chassis */
+.phone-frame.bare {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: var(--bg-surface);
+}
+
+.phone-frame.bare::after,
+.phone-frame.bare .phone-punch {
+  display: none;
+}
+
+.phone-frame.bare .phone-screen {
+  border-radius: 0;
+}
+
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px 6px;
+  font-size: 11.5px;
+  color: var(--text-lo);
+  letter-spacing: 0.02em;
+  flex: 0 0 auto;
+}
+
+.phone-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 18px 12px;
+  border-bottom: 1px solid var(--line);
+  flex: 0 0 auto;
+}
+
+.phone-header .brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.phone-header .brand i {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  background: var(--accent);
+  display: block;
+}
+
+.sim-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.sim-chip i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-warm);
+  display: block;
+}
+
+.phone-map {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  background: linear-gradient(180deg, #0e1424 0%, #141b2e 100%);
+}
+
+.phone-map canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.map-chip {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(11, 15, 26, 0.82);
+  border: 1px solid var(--line);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-hi);
+}
+
+.rec-pill {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(77, 225, 193, 0.12);
+  border: 1px solid rgba(77, 225, 193, 0.4);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.rec-pill i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: block;
+  animation: pulse 1.5s var(--ease) infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+}
+
+.conf-chip {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  background: rgba(11, 15, 26, 0.86);
+  border: 1px solid var(--line);
+}
+
+.conf-chip.high {
+  color: var(--accent);
+  border-color: rgba(77, 225, 193, 0.45);
+}
+
+.conf-chip.medium {
+  color: var(--accent-warm);
+  border-color: rgba(255, 180, 84, 0.45);
+}
+
+.conf-chip.low {
+  color: var(--warn);
+  border-color: rgba(255, 107, 107, 0.5);
+}
+
+.instruction {
+  padding: 15px 18px 12px;
+  flex: 0 0 auto;
+  min-height: 84px;
+}
+
+.instruction .primary {
+  font-size: 20px;
+  font-weight: 650;
+  line-height: 1.28;
+  letter-spacing: -0.01em;
+}
+
+.instruction .secondary {
+  margin-top: 5px;
+  font-size: 13px;
+  color: var(--text-lo);
+  line-height: 1.45;
+}
+
+.instruction.warn .primary {
+  color: var(--warn);
+}
+
+.stat-strip {
+  display: flex;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  flex: 0 0 auto;
+}
+
+.stat-strip .stat {
+  flex: 1;
+  padding: 11px 8px;
+  text-align: center;
+}
+
+.stat-strip .stat + .stat {
+  border-left: 1px solid var(--line);
+}
+
+.stat-strip .v {
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.stat-strip .k {
+  margin-top: 3px;
+  font-size: 9.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.stat-strip .k sup {
+  color: var(--accent-warm);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  margin-left: 2px;
+}
+
+.phone-action {
+  padding: 14px 18px 20px;
+  flex: 0 0 auto;
+}
+
+.phone-action button {
+  width: 100%;
+  padding: 15px 0;
+  border-radius: var(--r-md);
+  font-size: 15px;
+  font-weight: 700;
+  background: var(--accent);
+  color: #06231d;
+  transition: opacity var(--t-fast) var(--ease);
+}
+
+.phone-action button.ghost {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text-lo);
+}
+
+.phone-action button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------- cards ---------- */
+
+.card {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 5;
+  padding: 15px 16px;
+  border-radius: var(--r-md);
+  background: rgba(16, 22, 37, 0.97);
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.45);
+  animation: cardIn var(--t-mid) var(--ease);
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card .card-eyebrow {
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 7px;
+}
+
+.card .card-body {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text-hi);
+}
+
+.card.event {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  bottom: auto;
+  top: 46px;
+}
+
+.card.event .icon {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-size: 15px;
+}
+
+.card.event .t {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.card.event .s {
+  font-size: 11px;
+  color: var(--text-lo);
+  margin-top: 1px;
+}
+
+/* ---------- full-screen phone states ---------- */
+
+.phone-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 28px 22px;
+  background: linear-gradient(180deg, #0e1322 0%, #0b0f1a 100%);
+  animation: cardIn var(--t-mid) var(--ease);
+}
+
+.phone-overlay h3 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+}
+
+.phone-overlay p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-lo);
+}
+
+.phone-overlay .found-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 180, 84, 0.14);
+  border: 1px solid rgba(255, 180, 84, 0.4);
+  color: var(--accent-warm);
+  font-size: 28px;
+  margin-bottom: 18px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin: 20px 0;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.summary-grid div {
+  background: var(--bg-surface);
+  padding: 13px 14px;
+}
+
+.summary-grid .v {
+  font-size: 19px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-grid .k {
+  margin-top: 3px;
+  font-size: 9.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.phone-overlay .footnote {
+  margin-top: 16px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-faint);
+}
+
+.overlay-actions {
+  display: flex;
+  gap: 9px;
+  margin-top: 22px;
+}
+
+.overlay-actions button {
+  flex: 1;
+  padding: 14px 0;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 700;
+  background: var(--accent);
+  color: #06231d;
+}
+
+.overlay-actions button.ghost {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text-lo);
+}
+
+.morph {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  display: grid;
+  place-items: center;
+  background: var(--bg-surface);
+  animation: morphOut var(--t-slow) var(--ease) forwards;
+}
+
+.morph .spin {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-dim);
+  border-top-color: var(--accent);
+  animation: spin 900ms linear infinite;
+  margin: 0 auto 16px;
+}
+
+.morph .label {
+  font-size: 13px;
+  color: var(--text-lo);
+  text-align: center;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes morphOut {
+  0%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.toast-line {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 46px;
+  z-index: 7;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  background: rgba(77, 225, 193, 0.14);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 650;
+  text-align: center;
+  animation: cardIn var(--t-fast) var(--ease);
+}
+
+/* Route Overview is a bottom sheet, not a full cover: the exploded-floors map
+   above it is the point of the state, so it has to stay on screen. */
+.phone-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 8;
+  padding: 18px 18px 20px;
+  border-top: 1px solid var(--line);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  background: linear-gradient(180deg, #10162a 0%, #0b0f1a 100%);
+  box-shadow: 0 -18px 40px rgba(0, 0, 0, 0.5);
+  animation: cardIn var(--t-mid) var(--ease);
+}
+
+.phone-sheet h3 {
+  margin: 0 0 8px;
+  font-size: 21px;
+  letter-spacing: -0.02em;
+}
+
+.phone-sheet p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-lo);
+}
+
+.phone-sheet .summary-grid {
+  margin: 14px 0;
+}
+
+.phone-sheet .summary-grid div {
+  padding: 10px 12px;
+}
+
+.phone-sheet .summary-grid .v {
+  font-size: 16px;
+}
+
+.phone-sheet .footnote {
+  margin-top: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-faint);
+}
+
+.phone-sheet button {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px 0;
+  border-radius: var(--r-md);
+  font-size: 15px;
+  font-weight: 700;
+  background: var(--accent);
+  color: #06231d;
+}
+
+/* On a phone the sheet has to leave room for the map above it. */
+@media (max-width: 767px) {
+  .phone-sheet {
+    padding: 14px 16px 16px;
+  }
+
+  .phone-sheet h3 {
+    font-size: 19px;
+  }
+
+  /* One compact row instead of a 2x2 block: the map above needs the height. */
+  .phone-sheet .summary-grid {
+    grid-template-columns: repeat(4, 1fr);
+    margin: 11px 0;
+  }
+
+  .phone-sheet .summary-grid div {
+    padding: 8px 6px;
+    text-align: center;
+  }
+
+  .phone-sheet .summary-grid .v {
+    font-size: 14px;
+  }
+
+  .phone-sheet .summary-grid .k {
+    font-size: 8px;
+    letter-spacing: 0.06em;
+  }
+
+  .phone-sheet p {
+    font-size: 12.5px;
+  }
+
+  .phone-sheet .footnote {
+    display: none;
+  }
+
+  .phone-sheet button {
+    margin-top: 11px;
+    padding: 13px 0;
+  }
+}
