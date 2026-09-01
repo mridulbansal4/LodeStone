@@ -12,6 +12,7 @@ import {
   WorldToast,
   KeyLegend,
   SwapButton,
+  BackToMenu,
 } from './ui/WorldOverlays'
 import { installInput } from './ui/input'
 import { startLoop } from './sim/loop'
@@ -84,7 +85,10 @@ export default function App() {
             }}>
               Gamified Prototype
             </div>
-            <FloorBadge />
+            <div className="hud-topleft">
+              <BackToMenu />
+              <FloorBadge />
+            </div>
             {!mobile && <ZoomControls />}
             <UsePrompt />
             <WorldToast />

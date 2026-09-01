@@ -3,10 +3,17 @@
 
 export const SIM = {
   // movement
-  WALK_SPEED: 3.2,
-  SLOW_SPEED: 1.3,
+  WALK_SPEED: 3.4,
+  SLOW_SPEED: 0.8,
   SPRINT_SPEED: 6.4,
   ACCEL: 18,
+  /**
+   * Velocity response time in seconds: roughly how long to reach top speed.
+   * Deliberately NOT derived from WALK_SPEED. The old lerp was
+   * ACCEL * dt / WALK_SPEED, which made the ramp longer every time the top
+   * speed went up, so raising the speed made the controls feel slower.
+   */
+  MOVE_RESPONSE: 0.06,
   PLAYER_RADIUS: 0.35,
 
   // trail sampling
@@ -40,8 +47,8 @@ export const SIM = {
 
   // presentation
   WALK_BACK_SPEED: 1.2,
-  CAMERA_LERP: 0.12,
-  CAMERA_DEADZONE_PX: 48,
+  CAMERA_LERP: 0.2,
+  CAMERA_DEADZONE_PX: 16,
   ZOOM_MIN: 0.6,
   ZOOM_MAX: 1.6,
 

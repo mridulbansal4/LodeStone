@@ -160,9 +160,47 @@ button:active:not(:disabled) {
   color: var(--accent);
 }
 
-.floor-badge {
+/* Back and the floor badge share one row, so they cannot drift apart or
+   collide as their widths change with the floor name. */
+.hud-topleft {
+  position: absolute;
   top: 16px;
   left: 16px;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-topleft .hud-chip {
+  position: static;
+}
+
+.back-btn {
+  position: relative;
+  color: var(--text-hi);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Invisible hit padding, matching the zoom cluster: the chip is 38 px tall,
+   which is under the 44 px touch floor on its own. */
+.back-btn::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+}
+
+.back-btn:hover {
+  border-color: var(--accent);
+}
+
+.back-btn:hover .hud-icon {
+  transform: translateX(-2px);
+}
+
+.back-btn .hud-icon {
+  transition: transform var(--t-hover) var(--ease-out);
 }
 
 .floor-badge-text {
@@ -1126,6 +1164,14 @@ button:active:not(:disabled) {
 /* The world panel is short on a phone, so the controls get proportionally
    smaller - still comfortably above the 44px touch-target floor. */
 @media (max-width: 767px) {
+  /* Icon only: the arrow is unambiguous, and the freed width keeps the floor
+     badge clear of the swap button on a 375 px screen. */
+  .back-btn {
+    font-size: 0;
+    gap: 0;
+    padding: 0 11px;
+  }
+
   .joystick {
     width: 96px;
     height: 96px;

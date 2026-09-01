@@ -26,8 +26,11 @@ export function applyMovement(dt: number) {
   const desiredVx = (dirX / dirLen) * target
   const desiredVy = (dirY / dirLen) * target
 
-  // Accelerate toward the desired velocity rather than snapping to it.
-  const k = Math.min(1, (SIM.ACCEL * dt) / Math.max(SIM.WALK_SPEED, 0.001))
+  // Accelerate toward the desired velocity on a fixed response time, framed as
+  // an exponential so it behaves the same at any frame rate. Crucially this is
+  // independent of the top speed: the previous form divided by WALK_SPEED,
+  // which stretched the ramp every time the speed was raised.
+  const k = 1 - Math.exp(-dt / SIM.MOVE_RESPONSE)
   sim.player.vx += (desiredVx - sim.player.vx) * k
   sim.player.vy += (desiredVy - sim.player.vy) * k
 

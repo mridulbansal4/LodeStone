@@ -98,7 +98,7 @@ export function PhoneScreen() {
             </button>
           ) : (
             <button className="btn-filled" onClick={findMyCar} disabled={phase === 'carFound' || !ready}>
-              {ready ? 'Find my car' : 'Keep walking — building memory'}
+              {ready ? 'Find my car' : 'Keep walking to build memory'}
             </button>
           )}
         </div>

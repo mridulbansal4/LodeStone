@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { sim, Floor } from '../sim/state'
 import { getMap, MAP_W, MAP_H } from '../world/maps'
+import { ELEV } from '../world/maps/build'
 import { idx } from '../world/maps/build'
 import { isWalkable } from '../world/tiles'
 
@@ -21,7 +22,14 @@ const maskCache = new Map<number, Uint8Array>()
 const MW = Math.ceil(MAP_W / CELL)
 const MH = Math.ceil(MAP_H / CELL)
 
-/** Coarse walkable mask per floor: corridor spines and block masses only. */
+/**
+ * Coarse floor plate per level.
+ *
+ * The threshold is deliberately strict: a cell has to be mostly walkable to
+ * count. That punches a hole through every parked bay, which is the point -
+ * the rows of gaps are what make B3 read as a car park rather than a blank
+ * slab, and they show the shape of the aisles you actually walked down.
+ */
 function mask(f: Floor): Uint8Array {
   const hit = maskCache.get(f)
   if (hit) return hit
@@ -187,6 +195,7 @@ function draw(ctx: CanvasRenderingContext2D, w: number, h: number) {
     if (!showAll && f !== sim.player.floor) continue
     const relevant = routeFloors.has(f) || f === sim.player.floor
     drawPlate(ctx, f, relevant)
+    drawLiftMark(ctx, f)
   }
 
   if (showAll) drawShaft(ctx)
@@ -206,8 +215,12 @@ function drawPlate(ctx: CanvasRenderingContext2D, f: Floor, relevant: boolean) {
   const m = mask(f)
   const active = f === sim.player.floor
   ctx.save()
-  ctx.globalAlpha = active ? 0.85 : relevant ? 0.4 : 0.16
-  ctx.fillStyle = active ? '#233052' : '#1a2338'
+  ctx.globalAlpha = active ? 0.95 : relevant ? 0.5 : 0.2
+  ctx.fillStyle = active ? '#26334F' : '#1A2235'
+
+  // Only a hair of overlap: enough to kill seams between neighbouring cells,
+  // not enough to swallow the single-cell bay holes.
+  const e = 0.22
   for (let cy = 0; cy < MH; cy++) {
     for (let cx = 0; cx < MW; cx++) {
       if (!m[cy * MW + cx]) continue
@@ -216,14 +229,71 @@ function drawPlate(ctx: CanvasRenderingContext2D, f: Floor, relevant: boolean) {
       const px = sx(x, y)
       const py = sy(x, y, f)
       ctx.beginPath()
-      ctx.moveTo(px, py)
-      ctx.lineTo(px + MHW * CELL, py + MHH * CELL)
-      ctx.lineTo(px, py + MHH * CELL * 2)
-      ctx.lineTo(px - MHW * CELL, py + MHH * CELL)
+      ctx.moveTo(px, py - e)
+      ctx.lineTo(px + MHW * CELL + e, py + MHH * CELL)
+      ctx.lineTo(px, py + MHH * CELL * 2 + e)
+      ctx.lineTo(px - MHW * CELL - e, py + MHH * CELL)
       ctx.closePath()
       ctx.fill()
     }
   }
+
+  // Lit south edge: a cell with nothing below it is the front lip of the slab.
+  ctx.globalAlpha = active ? 0.42 : 0.18
+  ctx.strokeStyle = active ? '#4A5E8C' : '#2C3852'
+  ctx.lineWidth = 0.9
+  ctx.beginPath()
+  for (let cy = 0; cy < MH; cy++) {
+    for (let cx = 0; cx < MW; cx++) {
+      if (!m[cy * MW + cx]) continue
+      const below = cy + 1 < MH && m[(cy + 1) * MW + cx]
+      const right = cx + 1 < MW && m[cy * MW + cx + 1]
+      const x = cx * CELL
+      const y = cy * CELL
+      const px = sx(x, y)
+      const py = sy(x, y, f)
+      if (!below) {
+        ctx.moveTo(px - MHW * CELL, py + MHH * CELL)
+        ctx.lineTo(px, py + MHH * CELL * 2)
+      }
+      if (!right) {
+        ctx.moveTo(px, py + MHH * CELL * 2)
+        ctx.lineTo(px + MHW * CELL, py + MHH * CELL)
+      }
+    }
+  }
+  ctx.stroke()
+  ctx.restore()
+}
+
+/** The lift, marked on every floor it serves: the map's only fixed landmark. */
+function drawLiftMark(ctx: CanvasRenderingContext2D, f: Floor) {
+  const lx = ELEV.x + ELEV.w / 2
+  const ly = ELEV.y + ELEV.h / 2
+  const px = sx(lx, ly)
+  const py = sy(lx, ly, f) + MHH
+  const active = f === sim.player.floor
+  ctx.save()
+  ctx.globalAlpha = active ? 0.9 : 0.4
+  ctx.strokeStyle = '#7C8CB5'
+  ctx.lineWidth = 1.3
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
+  ctx.beginPath()
+  ctx.rect(px - 4.5, py - 5.5, 9, 9)
+  ctx.stroke()
+  ctx.beginPath()
+  ctx.moveTo(px - 1.6, py + 1.4)
+  ctx.lineTo(px - 1.6, py - 2.6)
+  ctx.moveTo(px - 3, py - 1.2)
+  ctx.lineTo(px - 1.6, py - 2.6)
+  ctx.lineTo(px - 0.2, py - 1.2)
+  ctx.moveTo(px + 1.6, py - 2.6)
+  ctx.lineTo(px + 1.6, py + 1.4)
+  ctx.moveTo(px + 0.2, py)
+  ctx.lineTo(px + 1.6, py + 1.4)
+  ctx.lineTo(px + 3, py)
+  ctx.stroke()
   ctx.restore()
 }
 
