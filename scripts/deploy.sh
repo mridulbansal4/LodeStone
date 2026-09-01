@@ -7,6 +7,9 @@
 # Only ever touches the park-trace instance. Nothing else in the project is
 # read or modified.
 set -euo pipefail
+# The host-key prompt is answered with a finite input rather than `yes`:
+# an endless writer dies of SIGPIPE when gcloud stops reading, and pipefail
+# would then fail the whole deploy with 141 after it had actually worked.
 
 PROJECT=nestiq-ai-pipeline
 ZONE=asia-south1-a
@@ -23,11 +26,11 @@ echo "==> packing dist/"
 tar -czf /tmp/parktrace-dist.tgz -C dist .
 
 echo "==> uploading to $VM"
-yes y 2>/dev/null | gcloud compute scp /tmp/parktrace-dist.tgz "$VM:/tmp/parktrace-dist.tgz" \
+{ echo y; echo y; echo y; } | gcloud compute scp /tmp/parktrace-dist.tgz "$VM:/tmp/parktrace-dist.tgz" \
   --project="$PROJECT" --zone="$ZONE" --quiet --ssh-key-file="$KEY"
 
 echo "==> swapping web root"
-yes y 2>/dev/null | gcloud compute ssh "$VM" --project="$PROJECT" --zone="$ZONE" --quiet \
+{ echo y; echo y; echo y; } | gcloud compute ssh "$VM" --project="$PROJECT" --zone="$ZONE" --quiet \
   --ssh-key-file="$KEY" --command='
 set -e
 sudo rm -rf /var/www/parktrace.new
