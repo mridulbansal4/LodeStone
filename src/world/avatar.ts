@@ -28,6 +28,11 @@ export interface AvatarOptions {
   /** Jacket colour: the same accent as the memory trail. */
   accent: string
   reducedMotion: boolean
+  /** Wall-clock ms, used only for the idle sway. */
+  time?: number
+  /** Ambient pedestrians skip the heading cone; it belongs to the player. */
+  cone?: boolean
+  bag?: boolean
 }
 
 function roundRect(
@@ -64,7 +69,10 @@ export function drawAvatar(ctx: CanvasRenderingContext2D, o: AvatarOptions) {
   // One full stride per 0.9 m, so the legs never skate.
   const phase = o.moving && !o.reducedMotion ? (o.distance / 0.9) * Math.PI * 2 : 0
   const swing = Math.sin(phase)
-  const bob = o.moving && !o.reducedMotion ? Math.abs(Math.sin(phase)) * 2.2 : 0
+  // Standing still still breathes, so the figure never looks like a decal.
+  const idle =
+    !o.moving && !o.reducedMotion && o.time !== undefined ? Math.sin(o.time / 900) * 0.5 : 0
+  const bob = (o.moving && !o.reducedMotion ? Math.abs(Math.sin(phase)) * 2.2 : 0) + idle
 
   // Ground shadow, squashed along the isometric ground plane.
   ctx.save()
@@ -77,6 +85,7 @@ export function drawAvatar(ctx: CanvasRenderingContext2D, o: AvatarOptions) {
 
   // Heading cone: a soft wedge on the ground, so facing is legible even when
   // the figure itself is only a few pixels wide.
+  if (o.cone !== false) {
   ctx.save()
   ctx.globalAlpha = 0.24
   ctx.fillStyle = o.accent
@@ -89,6 +98,7 @@ export function drawAvatar(ctx: CanvasRenderingContext2D, o: AvatarOptions) {
   ctx.closePath()
   ctx.fill()
   ctx.restore()
+  }
 
   const hipY = y - 15 - bob
   const shoulderY = y - 27 - bob
@@ -125,9 +135,15 @@ export function drawAvatar(ctx: CanvasRenderingContext2D, o: AvatarOptions) {
   ctx.stroke()
   ctx.restore()
 
-  // Far limbs first.
+  // Far limbs first, then the pack, then the torso over the top of it.
   leg(-swing * legSpread, TROUSER_DARK)
   arm(swing * legSpread, jacketDark)
+
+  if (o.bag) {
+    ctx.fillStyle = mix(o.accent, '#0B0F1A', 0.6)
+    roundRect(ctx, x - 7.4 - dir * 1.6, shoulderY + 2.5, 14.8, 11, 3.4)
+    ctx.fill()
+  }
 
   // Torso: a tapered jacket, slightly narrower at the waist.
   ctx.fillStyle = o.accent

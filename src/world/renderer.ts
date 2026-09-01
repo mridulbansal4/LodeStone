@@ -3,8 +3,9 @@ import { getMap, MAP_W, MAP_H } from './maps'
 import { idx } from './maps/build'
 import { T, HEIGHT, COLOR, isWalkable, tileTint } from './tiles'
 import { HW, HH, LIFT, toScreenX, toScreenY, shade } from './iso'
-import { drawVehicle, pickModel, pickPaint } from './vehicles'
+import { drawVehicle, pickModel, pickPaint, pickFlip } from './vehicles'
 import { drawAvatar } from './avatar'
+import { walkersOn } from './npcs'
 import { TILE_H } from '../sim/constants'
 
 const ACCENT = '#4DE1C1'
@@ -269,6 +270,13 @@ function drawPropLayer(
   const lot = collectParkedCars(g, x0, x1, y0, y1)
   let lotIndex = 0
 
+  // Ambient pedestrians, sorted into the same depth order. Decoration only:
+  // they hold no state and nothing collides with them.
+  const walkers = walkersOn(sim.player.floor, sim.time)
+    .map((wk) => ({ ...wk, d: wk.x + wk.y }))
+    .sort((a, b) => a.d - b.d)
+  let walkerIndex = 0
+
   for (let d = dMin; d <= dMax; d++) {
     while (lotIndex < lot.length && lot[lotIndex].d < d) {
       const b = lot[lotIndex++]
@@ -276,7 +284,11 @@ function drawPropLayer(
         model: pickModel(b.x, b.y),
         paint: pickPaint(b.x, b.y),
         axis: b.axis,
+        flip: pickFlip(b.x, b.y),
       })
+    }
+    while (walkerIndex < walkers.length && walkers[walkerIndex].d < d) {
+      drawWalker(ctx, walkers[walkerIndex++])
     }
     if (carVisible && !carDrawn && carD < d) {
       drawCar(ctx)
@@ -303,10 +315,29 @@ function drawPropLayer(
       model: pickModel(b.x, b.y),
       paint: pickPaint(b.x, b.y),
       axis: b.axis,
+      flip: pickFlip(b.x, b.y),
     })
   }
+  while (walkerIndex < walkers.length) drawWalker(ctx, walkers[walkerIndex++])
   if (carVisible && !carDrawn) drawCar(ctx)
   if (!playerDrawn) drawPlayer(ctx)
+}
+
+function drawWalker(
+  ctx: CanvasRenderingContext2D,
+  wk: { x: number; y: number; heading: number; accent: string; bag: boolean },
+) {
+  drawAvatar(ctx, {
+    x: toScreenX(wk.x, wk.y),
+    y: toScreenY(wk.x, wk.y) + HH,
+    heading: wk.heading,
+    distance: wk.x + wk.y,
+    moving: true,
+    accent: wk.accent,
+    reducedMotion: sim.ui.reducedMotion,
+    cone: false,
+    bag: wk.bag,
+  })
 }
 
 interface Bay {
@@ -450,6 +481,8 @@ function drawPlayer(ctx: CanvasRenderingContext2D) {
     moving: sim.player.speed > 0.2,
     accent: sim.phase === 'offRoute' ? WARN : ACCENT,
     reducedMotion: sim.ui.reducedMotion,
+    time: sim.time,
+    bag: true,
   })
 }
 

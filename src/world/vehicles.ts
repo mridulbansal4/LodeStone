@@ -8,7 +8,7 @@
 
 import { HW, HH, LIFT, toScreenX, toScreenY, shade } from './iso'
 
-export type CarModel = 'sports' | 'suv' | 'hatchback'
+export type CarModel = 'sports' | 'suv' | 'hatchback' | 'van' | 'pickup'
 
 interface Spec {
   /** Body length and width in metres. */
@@ -44,6 +44,16 @@ const SPECS: Record<CarModel, Spec> = {
     len: 3.0, wid: 1.65, bodyLo: 0.4, bodyHi: 1.02,
     cabFrom: 0.28, cabTo: 0.8, cabInset: 0.27, cabHi: 1.52, wheelR: 0.35, nose: 0.2,
   },
+  // Tall cargo box running almost the full length, barely inset.
+  van: {
+    len: 3.4, wid: 1.8, bodyLo: 0.44, bodyHi: 1.05,
+    cabFrom: 0.16, cabTo: 0.96, cabInset: 0.12, cabHi: 2.15, wheelR: 0.38, nose: 0.1,
+  },
+  // Short cab set forward, leaving an open bed behind it.
+  pickup: {
+    len: 3.5, wid: 1.78, bodyLo: 0.46, bodyHi: 1.12,
+    cabFrom: 0.46, cabTo: 0.8, cabInset: 0.22, cabHi: 1.86, wheelR: 0.42, nose: 0.14,
+  },
 }
 
 /** Muted lot colours: varied enough to read as a car park, quiet enough to sit behind the UI. */
@@ -64,9 +74,15 @@ function hash(x: number, y: number): number {
   return n - Math.floor(n)
 }
 
+const MODELS: CarModel[] = ['suv', 'hatchback', 'sports', 'hatchback', 'suv', 'van', 'sports', 'pickup']
+
 export function pickModel(x: number, y: number): CarModel {
-  const h = hash(x, y)
-  return h < 0.36 ? 'suv' : h < 0.72 ? 'hatchback' : 'sports'
+  return MODELS[Math.floor(hash(x, y) * MODELS.length) % MODELS.length]
+}
+
+/** Half the lot is parked nose-in, so some cars show tail lights instead of heads. */
+export function pickFlip(x: number, y: number): boolean {
+  return hash(x + 17.3, y - 4.1) < 0.5
 }
 
 export function pickPaint(x: number, y: number): string {
@@ -135,6 +151,8 @@ export interface CarOptions {
   paint: string
   /** 'x' points the bonnet down the +x axis, 'y' down the +y axis. */
   axis: 'x' | 'y'
+  /** Reverses the car end-for-end, so the visible face is its rear. */
+  flip?: boolean
   /** Lights on, slightly glossier paint: used for the player's own car. */
   hero?: boolean
 }
@@ -194,10 +212,11 @@ export function drawVehicle(ctx: CanvasRenderingContext2D, cx: number, cy: numbe
 
   // Lower body, with the nose shaved back so the front reads as a bonnet.
   const noseCut = s.nose * 0.5
+  const front = !o.flip // bonnet points down the +axis unless flipped
   prism(
     ctx,
-    alongX ? x0 + noseCut : x0,
-    alongX ? y0 : y0 + noseCut,
+    alongX ? x0 + (front ? noseCut : 0) : x0,
+    alongX ? y0 : y0 + (front ? noseCut : 0),
     alongX ? bw - noseCut : bw,
     alongX ? bl : bl - noseCut,
     s.bodyLo,
@@ -223,10 +242,28 @@ export function drawVehicle(ctx: CanvasRenderingContext2D, cx: number, cy: numbe
     alongX ? screen : glass,
   )
 
-  // Light bar across the nose.
-  const lit = o.hero ? '#FFE7B0' : '#C9D4E4'
+  // Rim light along the roof edge: a single bright line does more to lift the
+  // car off a dark deck than any amount of extra face shading.
   ctx.save()
-  ctx.globalAlpha = o.hero ? 0.95 : 0.5
+  ctx.strokeStyle = shade(body, 0.5)
+  ctx.globalAlpha = 0.55
+  ctx.lineWidth = 1.2
+  const cs = alongX ? x0 + cabStart : x0 + s.cabInset
+  const ct = alongX ? y0 + s.cabInset : y0 + cabStart
+  const cwid = alongX ? cabLen : bw - s.cabInset * 2
+  const clen = alongX ? bl - s.cabInset * 2 : cabLen
+  ctx.beginPath()
+  ctx.moveTo(sx(cs, ct), sy(cs, ct, s.cabHi))
+  ctx.lineTo(sx(cs + cwid, ct), sy(cs + cwid, ct, s.cabHi))
+  ctx.lineTo(sx(cs + cwid, ct + clen), sy(cs + cwid, ct + clen, s.cabHi))
+  ctx.stroke()
+  ctx.restore()
+
+  // Lamp bar on the visible end: white if we are looking at the nose, red if
+  // the car is parked the other way round.
+  const lit = o.flip ? '#E4564A' : o.hero ? '#FFE7B0' : '#C9D4E4'
+  ctx.save()
+  ctx.globalAlpha = o.hero ? 0.95 : o.flip ? 0.7 : 0.5
   ctx.fillStyle = lit
   const lh = s.bodyLo + (s.bodyHi - s.bodyLo) * 0.55
   if (alongX) {
