@@ -3,6 +3,8 @@ import { getMap, MAP_W, MAP_H } from './maps'
 import { idx } from './maps/build'
 import { T, HEIGHT, COLOR, isWalkable, tileTint } from './tiles'
 import { HW, HH, LIFT, toScreenX, toScreenY, shade } from './iso'
+import { drawVehicle, pickModel, pickPaint } from './vehicles'
+import { drawAvatar } from './avatar'
 import { TILE_H } from '../sim/constants'
 
 const ACCENT = '#4DE1C1'
@@ -251,8 +253,8 @@ function drawPropLayer(
   y0: number,
   y1: number,
 ) {
-  // Back-to-front along screen depth (x + y), so props and the avatar occlude
-  // each other correctly with no z-buffer.
+  // Back-to-front along screen depth (x + y), so props, vehicles and the
+  // avatar occlude each other correctly with no z-buffer.
   const dMin = x0 + y0
   const dMax = x1 + y1
   const playerD = sim.player.x + sim.player.y
@@ -261,7 +263,21 @@ function drawPropLayer(
   let playerDrawn = false
   let carDrawn = false
 
+  // Parked cars are stored as blocks of PARKED_CAR tiles. Collect each block
+  // once, so a bay renders as a single vehicle instead of a row of fused
+  // boxes, and sort it by the depth of its centre.
+  const lot = collectParkedCars(g, x0, x1, y0, y1)
+  let lotIndex = 0
+
   for (let d = dMin; d <= dMax; d++) {
+    while (lotIndex < lot.length && lot[lotIndex].d < d) {
+      const b = lot[lotIndex++]
+      drawVehicle(ctx, b.cx, b.cy, {
+        model: pickModel(b.x, b.y),
+        paint: pickPaint(b.x, b.y),
+        axis: b.axis,
+      })
+    }
     if (carVisible && !carDrawn && carD < d) {
       drawCar(ctx)
       carDrawn = true
@@ -275,13 +291,69 @@ function drawPropLayer(
     for (let x = xs; x <= xe; x++) {
       const y = d - x
       const t = g[idx(x, y)]
+      if (t === T.PARKED_CAR) continue // drawn as a whole vehicle above
       const h = HEIGHT[t]
       if (!h) continue
       drawBox(ctx, x, y, h, COLOR[t] ?? '#2A3454', t)
     }
   }
+  while (lotIndex < lot.length) {
+    const b = lot[lotIndex++]
+    drawVehicle(ctx, b.cx, b.cy, {
+      model: pickModel(b.x, b.y),
+      paint: pickPaint(b.x, b.y),
+      axis: b.axis,
+    })
+  }
   if (carVisible && !carDrawn) drawCar(ctx)
   if (!playerDrawn) drawPlayer(ctx)
+}
+
+interface Bay {
+  x: number
+  y: number
+  cx: number
+  cy: number
+  axis: 'x' | 'y'
+  d: number
+}
+
+/**
+ * Finds the top-left tile of every block of PARKED_CAR and measures it. A tile
+ * starts a block when neither its left nor its upper neighbour is a car, which
+ * is enough because the bays are laid out with gaps between them.
+ */
+function collectParkedCars(g: Uint8Array, x0: number, x1: number, y0: number, y1: number): Bay[] {
+  const out: Bay[] = []
+  // Widen the scan so a bay whose origin is just off-screen still draws.
+  const sx0 = Math.max(0, x0 - 5)
+  const sx1 = Math.min(MAP_W - 1, x1 + 5)
+  const sy0 = Math.max(0, y0 - 5)
+  const sy1 = Math.min(MAP_H - 1, y1 + 5)
+
+  for (let y = sy0; y <= sy1; y++) {
+    for (let x = sx0; x <= sx1; x++) {
+      if (g[idx(x, y)] !== T.PARKED_CAR) continue
+      if (x > 0 && g[idx(x - 1, y)] === T.PARKED_CAR) continue
+      if (y > 0 && g[idx(x, y - 1)] === T.PARKED_CAR) continue
+
+      let bw = 1
+      while (x + bw < MAP_W && g[idx(x + bw, y)] === T.PARKED_CAR) bw++
+      let bh = 1
+      while (y + bh < MAP_H && g[idx(x, y + bh)] === T.PARKED_CAR) bh++
+
+      out.push({
+        x,
+        y,
+        cx: x + bw / 2,
+        cy: y + bh / 2,
+        axis: bw >= bh ? 'x' : 'y',
+        d: x + y + (bw + bh) / 2,
+      })
+    }
+  }
+  out.sort((a, b) => a.d - b.d)
+  return out
 }
 
 function drawBox(ctx: CanvasRenderingContext2D, x: number, y: number, h: number, base: string, t: number) {
@@ -328,6 +400,7 @@ function drawBox(ctx: CanvasRenderingContext2D, x: number, y: number, h: number,
   }
 }
 
+/** The player's own car: same vehicle renderer, warm paint, plus the pin and halo. */
 function drawCar(ctx: CanvasRenderingContext2D) {
   const { x, y } = sim.car
   const tx = toScreenX(x, y)
@@ -335,115 +408,49 @@ function drawCar(ctx: CanvasRenderingContext2D) {
   const found = sim.phase === 'carFound'
   const pulse = 0.5 + 0.5 * Math.sin(sim.time / 420)
 
-  // Halo on the ground
+  // Ground halo, so the car is findable before you can read its shape.
   ctx.save()
-  ctx.globalAlpha = found ? 0.45 + pulse * 0.35 : 0.2 + pulse * 0.14
+  ctx.globalAlpha = found ? 0.42 + pulse * 0.32 : 0.18 + pulse * 0.12
   ctx.fillStyle = WARM
   ctx.beginPath()
-  ctx.ellipse(tx, ty + HH, HW * (found ? 3.4 : 2.4), HH * (found ? 3.4 : 2.4), 0, 0, Math.PI * 2)
+  ctx.ellipse(tx, ty + HH, HW * (found ? 3.4 : 2.5), HH * (found ? 3.4 : 2.5), 0, 0, Math.PI * 2)
   ctx.fill()
   ctx.restore()
 
-  // Body
-  const lift = 1.1 * LIFT
-  ctx.fillStyle = shade(WARM, -0.5)
-  ctx.beginPath()
-  ctx.moveTo(tx - HW * 1.3, ty + HH - lift)
-  ctx.lineTo(tx, ty + TILE_H - lift)
-  ctx.lineTo(tx, ty + TILE_H + 6)
-  ctx.lineTo(tx - HW * 1.3, ty + HH + 6)
-  ctx.closePath()
-  ctx.fill()
-  ctx.fillStyle = shade(WARM, -0.3)
-  ctx.beginPath()
-  ctx.moveTo(tx + HW * 1.3, ty + HH - lift)
-  ctx.lineTo(tx, ty + TILE_H - lift)
-  ctx.lineTo(tx, ty + TILE_H + 6)
-  ctx.lineTo(tx + HW * 1.3, ty + HH + 6)
-  ctx.closePath()
-  ctx.fill()
-  ctx.fillStyle = WARM
-  ctx.beginPath()
-  ctx.moveTo(tx, ty - lift + 2)
-  ctx.lineTo(tx + HW * 1.3, ty + HH - lift)
-  ctx.lineTo(tx, ty + TILE_H - lift)
-  ctx.lineTo(tx - HW * 1.3, ty + HH - lift)
-  ctx.closePath()
-  ctx.fill()
+  drawVehicle(ctx, x, y, { model: 'suv', paint: WARM, axis: 'x', hero: true })
 
-  // Marker pin
-  ctx.save()
+  // Marker pin, bobbing above the roof.
   const bob = Math.sin(sim.time / 500) * 4
-  ctx.globalAlpha = 0.95
+  const pinY = ty - 2.1 * LIFT - 20 + bob
+  ctx.save()
   ctx.fillStyle = WARM
   ctx.beginPath()
-  ctx.arc(tx, ty - lift - 24 + bob, 7, 0, Math.PI * 2)
+  ctx.moveTo(tx, pinY + 13)
+  ctx.lineTo(tx - 5.5, pinY + 4)
+  ctx.lineTo(tx + 5.5, pinY + 4)
+  ctx.closePath()
+  ctx.fill()
+  ctx.beginPath()
+  ctx.arc(tx, pinY, 7.5, 0, Math.PI * 2)
   ctx.fill()
   ctx.fillStyle = '#0B0F1A'
   ctx.beginPath()
-  ctx.arc(tx, ty - lift - 24 + bob, 3, 0, Math.PI * 2)
+  ctx.arc(tx, pinY, 3, 0, Math.PI * 2)
   ctx.fill()
   ctx.restore()
 }
 
 function drawPlayer(ctx: CanvasRenderingContext2D) {
   const { x, y } = sim.player
-  const tx = toScreenX(x, y)
-  const ty = toScreenY(x, y) + HH
-  const moving = sim.player.speed > 0.2
-  const bounce = moving && !sim.ui.reducedMotion ? Math.abs(Math.sin(sim.time / 90)) * 5 : 0
-
-  // Shadow
-  ctx.save()
-  ctx.globalAlpha = 0.35
-  ctx.fillStyle = '#000'
-  ctx.beginPath()
-  ctx.ellipse(tx, ty, 11, 6, 0, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.restore()
-
-  // Heading cone
-  ctx.save()
-  ctx.globalAlpha = 0.28
-  ctx.fillStyle = ACCENT
-  const hx = toScreenX(Math.cos(sim.player.heading), Math.sin(sim.player.heading))
-  const hy = toScreenY(Math.cos(sim.player.heading), Math.sin(sim.player.heading))
-  const ang = Math.atan2(hy, hx)
-  ctx.translate(tx, ty)
-  ctx.rotate(ang)
-  ctx.beginPath()
-  ctx.moveTo(6, 0)
-  ctx.lineTo(30, -13)
-  ctx.lineTo(30, 13)
-  ctx.closePath()
-  ctx.fill()
-  ctx.restore()
-
-  // Body
-  const bodyY = ty - 20 - bounce
-  ctx.fillStyle = shade(ACCENT, -0.55)
-  ctx.beginPath()
-  ctx.ellipse(tx, bodyY + 12, 8, 5, 0, 0, Math.PI * 2)
-  ctx.fill()
-
-  ctx.fillStyle = ACCENT
-  roundRect(ctx, tx - 7, bodyY, 14, 16, 6)
-  ctx.fill()
-
-  ctx.fillStyle = shade(ACCENT, 0.4)
-  ctx.beginPath()
-  ctx.arc(tx, bodyY - 5, 6.5, 0, Math.PI * 2)
-  ctx.fill()
-}
-
-function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
-  ctx.beginPath()
-  ctx.moveTo(x + r, y)
-  ctx.arcTo(x + w, y, x + w, y + h, r)
-  ctx.arcTo(x + w, y + h, x, y + h, r)
-  ctx.arcTo(x, y + h, x, y, r)
-  ctx.arcTo(x, y, x + w, y, r)
-  ctx.closePath()
+  drawAvatar(ctx, {
+    x: toScreenX(x, y),
+    y: toScreenY(x, y) + HH,
+    heading: sim.player.heading,
+    distance: sim.memory.total_distance_m,
+    moving: sim.player.speed > 0.2,
+    accent: sim.phase === 'offRoute' ? WARN : ACCENT,
+    reducedMotion: sim.ui.reducedMotion,
+  })
 }
 
 function drawLabels(ctx: CanvasRenderingContext2D) {
