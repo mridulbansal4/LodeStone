@@ -2,8 +2,8 @@ import { useUi } from '../sim/store'
 
 /**
  * Every figure here is DERIVED from a position the engine already knows.
- * The SIM superscript is the honesty marker required by the PRD - it must not
- * be removed to make the UI look tidier.
+ * The SIM marker is the honesty requirement from the PRD - it must not be
+ * removed to make the UI look tidier.
  */
 export function StatStrip() {
   // Primitive selectors: each is Object.is-compared, so a stat that has not
@@ -11,22 +11,26 @@ export function StatStrip() {
   const distance = useUi((s) => s.distance)
   const steps = useUi((s) => s.steps)
   const turns = useUi((s) => s.turns)
+
   return (
     <div className="stat-strip">
-      <Stat v={`${distance} m`} k="distance" />
-      <Stat v={steps.toLocaleString()} k="steps" />
-      <Stat v={String(turns)} k="turns" />
+      <Stat v={`${distance}`} unit="m" k="Distance" />
+      <Stat v={steps.toLocaleString()} k="Steps" />
+      <Stat v={String(turns)} k="Turns" />
     </div>
   )
 }
 
-function Stat({ v, k }: { v: string; k: string }) {
+function Stat({ v, unit, k }: { v: string; unit?: string; k: string }) {
   return (
     <div className="stat">
-      <div className="v">{v}</div>
+      <div className="v">
+        {v}
+        {unit && <span className="unit">{unit}</span>}
+      </div>
       <div className="k">
         {k}
-        <sup title="Simulated value, not a sensor reading">SIM</sup>
+        <em title="Simulated value, not a sensor reading">sim</em>
       </div>
     </div>
   )

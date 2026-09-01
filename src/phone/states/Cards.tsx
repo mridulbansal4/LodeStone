@@ -5,15 +5,22 @@ export function FloorEventCard() {
   const active = useUi((s) => s.transitionActive)
   const label = useUi((s) => s.transitionLbl)
   if (!active) return null
-  const icon = label.startsWith('Elevator') ? '⇅' : label.startsWith('Stairs') ? '⇈' : '⇗'
   return (
-    <div className="card event">
-      <div className="icon" aria-hidden="true">
-        {icon}
-      </div>
+    <div className="snackbar">
+      <span className="snackbar-icon" aria-hidden="true">
+        <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
+          <path
+            d="M5 7 5 15M5 7 2.6 9.4M5 7l2.4 2.4M13 11V3m0 8 2.4-2.4M13 11l-2.4-2.4"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
       <div>
-        <div className="t">{label}</div>
-        <div className="s">Floor event recorded</div>
+        <div className="snackbar-title">{label}</div>
+        <div className="snackbar-sub">Floor event recorded</div>
       </div>
     </div>
   )
@@ -30,9 +37,9 @@ export function MemoryCard() {
   if (!open || !summary) return null
   if (phase === 'findMyCar' || phase === 'routeOverview' || phase === 'returnNav') return null
   return (
-    <div className="card">
-      <div className="card-eyebrow">Memory created</div>
-      <div className="card-body">{summary}</div>
+    <div className="memory-card">
+      <div className="sheet-overline">Memory created</div>
+      <div className="memory-card-body">{summary}</div>
     </div>
   )
 }
@@ -55,7 +62,7 @@ export function Morph() {
     <div className="morph">
       <div>
         <div className="spin" aria-hidden="true" />
-        <div className="label">Recalling your walk…</div>
+        <div className="label">Recalling your walk</div>
       </div>
     </div>
   )

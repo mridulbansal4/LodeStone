@@ -59,7 +59,7 @@ confidence* and shows the whole stored route rather than guessing) → walk back
 ```
 src/sim/     the simulation - one mutable state object, 60 Hz fixed-step loop
 src/world/   the isometric mall: tile grids, culled canvas renderer, camera
-src/phone/   the simulated phone UI and its exploded-floors memory map
+src/phone/   the simulated Android handset and its Material 3 app UI
 src/ui/      landing, input, world overlays, touch controls
 ```
 

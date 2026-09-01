@@ -94,24 +94,36 @@ function sy(x: number, y: number, f: Floor) {
   return (x + y) * MHH + floorOffset(f)
 }
 
-let insetCache = 0
+let insets = { top: 0, bottom: 0 }
 let insetTick = 0
 
 /**
- * How much of the map canvas the Route Overview sheet is covering. Measured
- * rather than assumed, because the sheet's height is content-driven.
+ * The band of the map that is not covered by the floating top bar or the
+ * bottom sheet. Both are measured rather than assumed: the sheet's height is
+ * content-driven and changes per state, and the top bar sits lower on desktop
+ * (below the status bar) than it does on a real phone.
+ *
+ * Also publishes the sheet height as --sheet-h so the confidence chip and the
+ * Memory Created card can sit just above the sheet in CSS.
  */
-function bottomInset(canvas: HTMLCanvasElement): number {
+function measureInsets(canvas: HTMLCanvasElement): { top: number; bottom: number } {
   if (insetTick++ % 10 === 0) {
-    const sheet = document.querySelector('.phone-sheet') as HTMLElement | null
-    if (!sheet) insetCache = 0
-    else {
-      const c = canvas.getBoundingClientRect()
+    const screen = canvas.closest('.phone-screen') as HTMLElement | null
+    const c = canvas.getBoundingClientRect()
+    const sheet = screen?.querySelector('.bottom-sheet') as HTMLElement | null
+    const bar = screen?.querySelector('.top-bar') as HTMLElement | null
+
+    let bottom = 0
+    if (sheet && screen) {
       const sh = sheet.getBoundingClientRect()
-      insetCache = Math.max(0, Math.min(c.height, c.bottom - sh.top))
+      bottom = Math.max(0, Math.min(c.height, c.bottom - sh.top))
+      screen.style.setProperty('--sheet-h', `${Math.round(sh.height)}px`)
     }
+
+    const top = bar ? Math.max(0, Math.min(c.height, bar.getBoundingClientRect().bottom - c.top + 8)) : 0
+    insets = { top, bottom }
   }
-  return insetCache
+  return insets
 }
 
 function draw(ctx: CanvasRenderingContext2D, w: number, h: number) {
@@ -122,8 +134,12 @@ function draw(ctx: CanvasRenderingContext2D, w: number, h: number) {
   const routeFloors = new Set(sim.memory.simplified.map((n) => n.floor))
   const showAll = overview || sim.memory.simplified.length > 0
 
-  const inset = bottomInset(ctx.canvas)
-  const availH = Math.max(60, h - inset)
+  // Draw into the band the top bar and the sheet leave free.
+  const ins = measureInsets(ctx.canvas)
+  const top = Math.min(ins.top, h * 0.34)
+  const bottom = h - ins.bottom
+  const availH = Math.max(60, bottom - top)
+  const midY = (top + bottom) / 2
 
   ctx.save()
   if (showAll) {
@@ -152,15 +168,18 @@ function draw(ctx: CanvasRenderingContext2D, w: number, h: number) {
       add(sx(MAP_W, 0), sy(MAP_W, 0, f))
       add(sx(0, MAP_H), sy(0, MAP_H, f))
     }
-    const pad = 16
+    const pad = 12
     const bw = Math.max(1, maxX - minX)
     const bh = Math.max(1, maxY - minY)
     const scale = Math.max(0.35, Math.min(2.4, Math.min((w - pad * 2) / bw, (availH - pad * 2) / bh)))
-    ctx.translate(w / 2 - ((minX + maxX) / 2) * scale, availH / 2 - ((minY + maxY) / 2) * scale)
+    ctx.translate(w / 2 - ((minX + maxX) / 2) * scale, midY - ((minY + maxY) / 2) * scale)
     ctx.scale(scale, scale)
   } else {
     const z = 1.6
-    ctx.translate(w / 2 - sx(sim.player.x, sim.player.y) * z, availH / 2 - sy(sim.player.x, sim.player.y, sim.player.floor) * z)
+    ctx.translate(
+      w / 2 - sx(sim.player.x, sim.player.y) * z,
+      midY - sy(sim.player.x, sim.player.y, sim.player.floor) * z,
+    )
     ctx.scale(z, z)
   }
 

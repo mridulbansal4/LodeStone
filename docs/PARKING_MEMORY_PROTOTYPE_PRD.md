@@ -265,32 +265,49 @@ Signs ("FOOD COURT", "LIFTS", "B3 PARKING"), planters, benches, an atrium founta
 
 A **simulated phone drawn in HTML/CSS/canvas** — not an emulator, not a screen mirror, no Android toolchain involved.
 
-- Pixel-6-class proportions, portrait: `9:19.5`, rendered at `~360 × 780` CSS px and scaled to fit. **[Assumption]**
-- Rounded chassis with a thin bezel, a centred punch-hole dot (decorative only), a subtle screen sheen, and a soft drop shadow.
-- Docked right on desktop, floating above the world with a small parallax lift.
+- Current-generation Android proportions, portrait: `372 × 786` CSS px, height-driven with a fixed aspect ratio so a short viewport shortens the handset rather than squashing it. **[Assumption]**
+- Flat display, uniform hairline bezel, machined aluminium rail, volume rocker and power key proud of the right edge, centred hole-punch camera.
+- The screen runs a Material 3 dark app: Android status bar (clock left, signal / Wi-Fi / battery right), a floating top app bar, and the gesture navigation pill. The status bar and pill sit above every app surface, because the OS draws them.
+- Docked right on desktop.
 
 ### 6.2 Screen layout
 
+Structured the way a real Android navigation app is: a full-bleed map with the
+system bars drawn over it, a floating top bar, and a bottom sheet that owns all
+the content.
+
 ```
 +---------------------------+
-| 9:41            ...  78%  |  status bar (static, decorative)
-+---------------------------+
-| Parking Memory      * SIM |  header + simulation badge
-+---------------------------+
+| 9:41              signal  |  status bar, transparent over the map
+|                 wifi batt |
+|  +---------------------+  |
+|  | (o) Parking Memory  |  |  floating top app bar (M3 surface-container-high)
+|  |                 SIM |  |
+|  +---------------------+  |
+|  [B3 Parking]  [o Remem.] |  chips over the map
 |                           |
-|   ISOMETRIC MEMORY MAP    |  ~52% of screen height
-|   . trail  . route  . car |
-|   . you    . floor chip   |
+|      FULL-BLEED           |  the exploded-floors memory map
+|      MEMORY MAP           |
 |                           |
-+---------------------------+
-|  PRIMARY LINE             |  instruction / status, >=20px semibold
-|  secondary line           |
-+---------------------------+
-| 182 m | 241 steps | 4 turns|  stat strip (tabular numerals)
-+---------------------------+
-|   [ FIND MY CAR ]         |  persistent action button
+|  [.ııl High]              |  confidence chip, parked above the sheet
+| .-----------------------. |
+| |          --           | |  bottom sheet, 28dp top corners, drag handle
+| | (i) Continue 24 m     | |  instruction: tonal icon + M3 title
+| |     18 m to your car  | |
+| | +-------+------+----+ | |
+| | | 182 m | 241  |  4 | | |  stat row (tabular numerals + SIM markers)
+| | +-------+------+----+ | |
+| | (   Find my car     ) | |  M3 filled button, fully rounded
+| '-----------------------' |
+|          -----            |  gesture navigation pill
 +---------------------------+
 ```
+
+Material 3 dark tokens drive the whole surface: `surface`, `surface-container`,
+`surface-container-high`, `on-surface`, `on-surface-variant`, `primary` /
+`on-primary` / `primary-container`, plus `tertiary` for the SIM marker and
+`error` for the off-route state. Type is the Roboto stack on the Material
+scale, with tabular numerals wherever a figure ticks.
 
 ### 6.3 The isometric map inside the phone
 
@@ -697,8 +714,9 @@ parking-memory/
     │   ├── renderer.ts            Culled, depth-sorted canvas draw of the world
     │   └── MallView.tsx           Canvas host + its own animation frame
     ├── phone/
-    │   ├── PhoneFrame.tsx         Device chassis; dropped on mobile viewports
+    │   ├── PhoneFrame.tsx         Android chassis: rail, keys, hole-punch
     │   ├── PhoneScreen.tsx        State router for the 13 UI states
+    │   ├── StatusBar.tsx          Android status bar with real icon geometry
     │   ├── MemoryMap.tsx          Canvas: exploded-floors isometric memory map
     │   ├── StatStrip.tsx          Distance / steps / turns, with SIM markers
     │   ├── Instruction.tsx        Primary + secondary guidance lines
@@ -728,6 +746,9 @@ parking-memory/
 | `world/npc.ts` not implemented | It is the first item on the §16 cut list and was not needed. |
 | `framer-motion` not installed | CSS transitions were sufficient, as §9 allowed. One less dependency. |
 | `scripts/make-icons.mjs` added | Generates the PWA icons from code so no image tooling is needed to rebuild them. |
+| The phone is a Material 3 dark app, not a bespoke panel layout | The original screen layout was a stack of custom rows. Rebuilt on Material 3 structure - system bars, floating top app bar, bottom sheet, filled/tonal buttons, tonal icon containers - so it reads as a real Android app rather than a styled web page. |
+| The map is full-bleed with the chrome floating over it | Matches how every Android navigation app is laid out, and gives the exploded-floors map far more room than a boxed map area did. |
+| The map measures the top bar and sheet rather than assuming insets | The sheet height is content-driven and the top bar sits lower on desktop than on a phone; measuring keeps the map centred in the band actually left free, and publishes `--sheet-h` so chips can park above the sheet. |
 | `sim/loop.ts` exports `stepFrames()` | A test seam: it advances the simulation deterministically without `requestAnimationFrame`, which is how the §14 checks were run in a browser. The app itself always runs through `startLoop()`. |
 
 ## 13. Implementation phases
@@ -971,7 +992,7 @@ Every judgement call made in this document, in one place. All are reversible.
 | A7 | Off-route 8 m / recover 4 m with hold timers; final values tuned in rehearsal | §7.10 |
 | A8 | Confidence is a single distance-derived scalar, not a sensor model | §7.11 |
 | A9 | Colour tokens and Inter / system-UI typography | §4.6 |
-| A10 | Phone rendered at 360 × 780 CSS px, Pixel-6-class proportions | §6.1 |
+| A10 | Handset rendered at 372 × 786 CSS px, height-driven with a fixed aspect ratio | §6.1 |
 | A11 | Canvas 2D over WebGL, for compatibility and to enforce "not 3D" | §9 |
 | A12 | Vercel as host; Netlify / GitHub Pages are equivalent substitutes | §11 |
 | A13 | Bounce-based avatar animation acceptable in place of a walk cycle | §4.4 |

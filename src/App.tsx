@@ -36,6 +36,10 @@ export default function App() {
     sync()
     mq.addEventListener('change', sync)
     rm.addEventListener('change', sync)
+    // matchMedia's change event is not always delivered on orientation or
+    // viewport changes in mobile browsers, so re-read on resize too.
+    window.addEventListener('resize', sync)
+    window.addEventListener('orientationchange', sync)
 
     const onTouch = () => setTouch(true)
     window.addEventListener('touchstart', onTouch, { once: true })
@@ -44,6 +48,8 @@ export default function App() {
       uninstall()
       mq.removeEventListener('change', sync)
       rm.removeEventListener('change', sync)
+      window.removeEventListener('resize', sync)
+      window.removeEventListener('orientationchange', sync)
       window.removeEventListener('touchstart', onTouch)
     }
   }, [])

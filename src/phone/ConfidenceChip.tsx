@@ -8,11 +8,25 @@ import { useUi } from '../sim/store'
 export function ConfidenceChip() {
   const band = useUi((s) => s.confBand)
   const cls = band.toLowerCase()
-  const glyph = band === 'High' ? '◉' : band === 'Medium' ? '◎' : '○'
+  const bars = band === 'High' ? 3 : band === 'Medium' ? 2 : 1
+
   return (
     <div className={`conf-chip ${cls}`} title="Simulated confidence: derived from distance to the route">
-      <span aria-hidden="true">{glyph}</span>
-      {band} confidence
+      <svg width="13" height="11" viewBox="0 0 14 12" aria-hidden="true">
+        {[0, 1, 2].map((i) => (
+          <rect
+            key={i}
+            x={i * 5}
+            y={8 - i * 3.4}
+            width="3.4"
+            height={4 + i * 3.4}
+            rx="1.2"
+            fill="currentColor"
+            opacity={i < bars ? 1 : 0.28}
+          />
+        ))}
+      </svg>
+      {band}
     </div>
   )
 }
