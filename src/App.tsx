@@ -59,7 +59,7 @@ export default function App() {
   const showTouch = touch || mobile
 
   return (
-    <div className={`app${mobile ? ' mobile' : ''}${swapped ? ' swapped' : ''}`}>
+    <div className={`app${mobile ? ' mobile' : ''}${swapped ? ' swapped' : ''} phase-${phase}`}>
       <div className="world-panel">
         <MallView />
         {phase !== 'landing' && (
