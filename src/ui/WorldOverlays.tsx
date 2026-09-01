@@ -134,7 +134,7 @@ export function KeyLegend() {
   if (!show) return null
   const rows: [string[], string][] = [
     [['W', 'A', 'S', 'D'], 'move'],
-    [['Shift'], 'walk slowly'],
+    [['Shift'], 'sprint'],
     [['E'], 'lift / stairs'],
     [['F'], 'find my car'],
     [['G'], 'start guidance'],

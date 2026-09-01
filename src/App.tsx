@@ -64,6 +64,26 @@ export default function App() {
         <MallView />
         {phase !== 'landing' && (
           <>
+            <div style={{
+              position: 'absolute',
+              top: '24px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: 'rgba(243, 115, 56, 0.15)',
+              color: '#F37338',
+              padding: '6px 16px',
+              borderRadius: '20px',
+              fontSize: '11px',
+              fontWeight: 700,
+              letterSpacing: '1.5px',
+              textTransform: 'uppercase',
+              backdropFilter: 'blur(4px)',
+              pointerEvents: 'none',
+              zIndex: 100,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            }}>
+              Gamified Prototype
+            </div>
             <FloorBadge />
             {!mobile && <ZoomControls />}
             <UsePrompt />

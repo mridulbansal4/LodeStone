@@ -23,6 +23,17 @@ export function Landing() {
       <header className="mc-header-row" aria-label="Header">
         <div className="mc-brand-open">
           <span className="mc-brand-title">LodeStone</span>
+          <span style={{ 
+            fontSize: '11px', 
+            letterSpacing: '1px', 
+            textTransform: 'uppercase', 
+            marginLeft: '12px',
+            color: '#F37338',
+            fontWeight: 600,
+            padding: '4px 8px',
+            background: 'rgba(243, 115, 56, 0.1)',
+            borderRadius: '4px'
+          }}>Gamified Prototype</span>
         </div>
 
         <nav className="mc-nav-pill" aria-label="Main Navigation">

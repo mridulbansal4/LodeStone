@@ -69,7 +69,7 @@ export interface SimObject {
   car: { x: number; y: number; floor: Floor }
   camera: { x: number; y: number; zoom: number; initialised: boolean }
 
-  input: { up: boolean; down: boolean; left: boolean; right: boolean; slow: boolean; joy: { x: number; y: number } }
+  input: { up: boolean; down: boolean; left: boolean; right: boolean; slow: boolean; sprint: boolean; joy: { x: number; y: number } }
 
   memory: {
     route_id: string
@@ -152,7 +152,7 @@ function createInitial(): SimObject {
     player: { x: 0, y: 0, floor: -3, heading: 0, vx: 0, vy: 0, speed: 0 },
     car: { x: 0, y: 0, floor: -3 },
     camera: { x: 0, y: 0, zoom: 1, initialised: false },
-    input: { up: false, down: false, left: false, right: false, slow: false, joy: { x: 0, y: 0 } },
+    input: { up: false, down: false, left: false, right: false, slow: false, sprint: false, joy: { x: 0, y: 0 } },
     memory: {
       route_id: uuid(),
       created_at: new Date().toISOString(),

@@ -84,12 +84,52 @@ export function rdp<Tp extends Pt>(pts: Tp[], eps: number): Tp[] {
 }
 
 /**
+ * Removes loops from a path. If the path crosses itself or comes very close to a
+ * previously visited point on the same floor, it pinches off the loop.
+ */
+export function removeLoops(path: Sample[], thresholdDist: number = 3.0): Sample[] {
+  if (path.length < 3) return path.slice()
+
+  const out: Sample[] = []
+  let i = 0
+
+  while (i < path.length) {
+    out.push(path[i])
+    
+    // Look ahead for the furthest point that is close to the current point
+    // We add a small offset (5 samples) so we don't pinch off immediate adjacent samples.
+    let jumpTo = -1
+    for (let j = path.length - 1; j > i + 5; j--) {
+      if (path[i].floor !== path[j].floor) continue
+      
+      const d = Math.hypot(path[i].x - path[j].x, path[i].y - path[j].y)
+      if (d < thresholdDist) {
+        jumpTo = j
+        break // Found the furthest point that forms a loop
+      }
+    }
+    
+    if (jumpTo !== -1) {
+      // Pinch off the loop
+      i = jumpTo
+    } else {
+      i++
+    }
+  }
+
+  return out
+}
+
+/**
  * Build the return route: the player's own trail, reversed, simplified per
  * floor run so that a floor change always survives as its own node.
  */
 export function buildSimplifiedRoute(): RouteNode[] {
-  const rev = sim.memory.path.slice().reverse()
+  let rev = sim.memory.path.slice().reverse()
   if (rev.length === 0) return []
+  
+  // Strip out loops/detours before applying RDP simplification
+  rev = removeLoops(rev)
 
   const out: RouteNode[] = []
   let run: Sample[] = []

@@ -30,7 +30,7 @@ export function installInput() {
     switch (e.code) {
       case 'ShiftLeft':
       case 'ShiftRight':
-        sim.input.slow = true
+        sim.input.sprint = true
         break
       case 'KeyE':
         if (sim.ui.floorPicker) sim.ui.floorPicker = false
@@ -82,12 +82,13 @@ export function installInput() {
   const up = (e: KeyboardEvent) => {
     const mv = MOVE_KEYS[e.code]
     if (mv) sim.input[mv] = false
-    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') sim.input.slow = false
+    if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') sim.input.sprint = false
   }
 
   const blur = () => {
     sim.input.up = sim.input.down = sim.input.left = sim.input.right = false
     sim.input.slow = false
+    sim.input.sprint = false
     sim.input.joy.x = 0
     sim.input.joy.y = 0
   }

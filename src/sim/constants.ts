@@ -5,6 +5,7 @@ export const SIM = {
   // movement
   WALK_SPEED: 3.2,
   SLOW_SPEED: 1.3,
+  SPRINT_SPEED: 6.4,
   ACCEL: 18,
   PLAYER_RADIUS: 0.35,
 
@@ -23,7 +24,7 @@ export const SIM = {
 
   // memory + route
   MEMORY_MIN_DIST: 40,
-  RDP_EPSILON: 1.2,
+  RDP_EPSILON: 5.0, // Increased from 1.2 to aggressively straighten out paths and ignore wiggles
   NODE_REACH: 3.0,
 
   // off route / recovery

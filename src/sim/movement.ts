@@ -18,7 +18,7 @@ export function applyMovement(dt: number) {
     v /= mag
   }
 
-  const target = mag > 0.05 ? (i.slow ? SIM.SLOW_SPEED : SIM.WALK_SPEED) : 0
+  const target = mag > 0.05 ? (i.sprint ? SIM.SPRINT_SPEED : i.slow ? SIM.SLOW_SPEED : SIM.WALK_SPEED) : 0
   const dirX = mag > 0.05 ? (u + v) / 2 : 0
   const dirY = mag > 0.05 ? (v - u) / 2 : 0
   const dirLen = Math.hypot(dirX, dirY) || 1
