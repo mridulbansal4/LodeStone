@@ -565,11 +565,11 @@ SVG.
 key and no `.env` file.
 
 ```bash
-git clone https://github.com/mridulbansal4/LodeStone.git
+git clone https://github.com/mridulbansal4/ParkTrace.git
 ```
 
 ```bash
-cd LodeStone
+cd ParkTrace
 ```
 
 ```bash
