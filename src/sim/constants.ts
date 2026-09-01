@@ -3,8 +3,8 @@
 
 export const SIM = {
   // movement
-  WALK_SPEED: 3.2,
-  SLOW_SPEED: 1.3,
+  WALK_SPEED: 2.2,
+  SLOW_SPEED: 1.0,
   SPRINT_SPEED: 6.4,
   ACCEL: 18,
   PLAYER_RADIUS: 0.35,
