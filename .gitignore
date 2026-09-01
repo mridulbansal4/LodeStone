@@ -7,3 +7,11 @@ Thumbs.db
 .vscode/
 .idea/
 npm-debug.log*
+
+.claude/
+.agent/
+
+
+# Internal demo run-sheet: not for the public repo.
+DEMO_SCRIPT.md
+.serena/
