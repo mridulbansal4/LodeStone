@@ -11,8 +11,11 @@ import { transitionLabel } from './floors'
  * once per tick and this store only updates the keys that actually changed,
  * so a stat ticking over never re-renders the world.
  */
+export type AppRoute = 'overview' | 'pdr' | 'floors' | 'technology'
+
 export interface UiSnap {
   phase: Phase
+  route: AppRoute
   floor: Floor
   floorLbl: string
   floorNm: string
@@ -45,6 +48,7 @@ export interface UiSnap {
 
 const initial: UiSnap = {
   phase: 'landing',
+  route: 'overview',
   floor: -3,
   floorLbl: 'B3',
   floorNm: 'B3 Parking',
@@ -90,6 +94,7 @@ export function syncUI() {
   }
 
   put('phase', sim.phase)
+  put('route', s.route) // route is driven by UI, not sim, but included for completeness if needed
   put('floor', sim.player.floor)
   put('floorLbl', floorLabel(sim.player.floor))
   put('floorNm', floorName(sim.player.floor))
