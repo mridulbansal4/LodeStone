@@ -2,14 +2,29 @@ import { useUi, setUi } from '../sim/store'
 import { sim, floorLabel, Floor } from '../sim/state'
 import { startTransition } from '../sim/floors'
 import { nudgeZoom } from '../world/camera'
+import {
+  LayersIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+  KeyboardIcon,
+  ElevatorIcon,
+  StairsIcon,
+  EscalatorIcon,
+  SwapIcon,
+} from './icons'
 
 export function FloorBadge() {
   const lbl = useUi((s) => s.floorLbl)
   const nm = useUi((s) => s.floorNm)
   return (
-    <div className="floor-badge">
-      <b>{lbl}</b>
-      <span>{nm.replace(/^\S+\s/, '')}</span>
+    <div className="hud-chip floor-badge">
+      <span className="hud-icon" aria-hidden="true">
+        <LayersIcon size={17} />
+      </span>
+      <span className="floor-badge-text">
+        <b>{lbl}</b>
+        <span>{nm.replace(/^\S+\s/, '')}</span>
+      </span>
     </div>
   )
 }
@@ -17,22 +32,29 @@ export function FloorBadge() {
 export function ZoomControls() {
   const showLegend = useUi((s) => s.showLegend)
   return (
-    <div className="zoom-controls">
-      <button onClick={() => nudgeZoom(0.15)} aria-label="Zoom in">
-        +
+    <div className="hud-cluster">
+      <button className="icon-btn" onClick={() => nudgeZoom(0.15)} aria-label="Zoom in">
+        <ZoomInIcon />
       </button>
-      <button onClick={() => nudgeZoom(-0.15)} aria-label="Zoom out">
-        −
+      <button className="icon-btn" onClick={() => nudgeZoom(-0.15)} aria-label="Zoom out">
+        <ZoomOutIcon />
       </button>
       <button
-        className="icon-btn"
+        className={`icon-btn${showLegend ? ' is-on' : ''}`}
         onClick={() => setUi({ showLegend: !showLegend })}
         aria-label="Toggle controls"
+        aria-pressed={showLegend}
       >
-        ?
+        <KeyboardIcon />
       </button>
     </div>
   )
+}
+
+function PadIcon({ type }: { type: string | null }) {
+  if (type === 'STAIRS') return <StairsIcon size={17} />
+  if (type === 'ESCALATOR') return <EscalatorIcon size={17} />
+  return <ElevatorIcon size={17} />
 }
 
 export function UsePrompt() {
@@ -44,8 +66,11 @@ export function UsePrompt() {
   const label = padType === 'ELEVATOR' ? 'the lift' : padType === 'STAIRS' ? 'the stairs' : 'the escalator'
   return (
     <div className="use-prompt">
-      <kbd>E</kbd>
+      <span className="hud-icon" aria-hidden="true">
+        <PadIcon type={padType} />
+      </span>
       <span>Use {label}</span>
+      <kbd>E</kbd>
     </div>
   )
 }
@@ -62,7 +87,8 @@ export function FloorPicker() {
         <div className="row">
           {targets.map((f: Floor, i: number) => (
             <button key={f} className="floor-btn" onClick={() => startTransition(f)}>
-              <kbd>{i + 1}</kbd> {floorLabel(f)}
+              <b>{floorLabel(f)}</b>
+              <kbd>{i + 1}</kbd>
             </button>
           ))}
         </div>
@@ -78,7 +104,7 @@ export function TransitionVeil() {
   if (!active) return null
   return (
     <div className="transition-veil">
-      <div style={{ textAlign: 'center' }}>
+      <div className="veil-inner">
         <div className="ticker">{floorLbl}</div>
         <div className="sub">{lbl}</div>
       </div>
@@ -92,36 +118,39 @@ export function WorldToast() {
   return <div className="world-toast">{toast}</div>
 }
 
+export function SwapButton({ swapped, onToggle }: { swapped: boolean; onToggle: () => void }) {
+  return (
+    <button className="hud-chip swap-btn" onClick={onToggle}>
+      <span className="hud-icon" aria-hidden="true">
+        <SwapIcon />
+      </span>
+      {swapped ? 'Show phone' : 'Full map'}
+    </button>
+  )
+}
+
 export function KeyLegend() {
   const show = useUi((s) => s.showLegend)
   if (!show) return null
+  const rows: [string[], string][] = [
+    [['W', 'A', 'S', 'D'], 'move'],
+    [['Shift'], 'walk slowly'],
+    [['E'], 'lift / stairs'],
+    [['F'], 'find my car'],
+    [['G'], 'start guidance'],
+    [['R'], 'restart'],
+    [['+', '−'], 'zoom'],
+  ]
   return (
     <div className="key-legend">
-      <span>
-        <kbd>W</kbd>
-        <kbd>A</kbd>
-        <kbd>S</kbd>
-        <kbd>D</kbd> move
-      </span>
-      <span>
-        <kbd>Shift</kbd> walk slowly
-      </span>
-      <span>
-        <kbd>E</kbd> lift / stairs
-      </span>
-      <span>
-        <kbd>F</kbd> find my car
-      </span>
-      <span>
-        <kbd>G</kbd> start guidance
-      </span>
-      <span>
-        <kbd>R</kbd> restart
-      </span>
-      <span>
-        <kbd>+</kbd>
-        <kbd>−</kbd> zoom
-      </span>
+      {rows.map(([keys, label]) => (
+        <span key={label}>
+          {keys.map((k) => (
+            <kbd key={k}>{k}</kbd>
+          ))}
+          {label}
+        </span>
+      ))}
     </div>
   )
 }

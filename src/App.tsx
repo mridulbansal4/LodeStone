@@ -11,6 +11,7 @@ import {
   TransitionVeil,
   WorldToast,
   KeyLegend,
+  SwapButton,
 } from './ui/WorldOverlays'
 import { installInput } from './ui/input'
 import { startLoop } from './sim/loop'
@@ -36,22 +37,21 @@ export default function App() {
       sim.ui.reducedMotion = rm.matches
     }
     sync()
-    mq.addEventListener('change', sync)
     rm.addEventListener('change', sync)
-    // matchMedia's change event is not always delivered on orientation or
-    // viewport changes in mobile browsers, so re-read on resize too.
-    window.addEventListener('resize', sync)
-    window.addEventListener('orientationchange', sync)
+    // Observe the layout instead of listening for viewport events: matchMedia
+    // 'change', 'resize' and 'orientationchange' are all unreliable across
+    // mobile browsers and emulated viewports, but a ResizeObserver fires
+    // whenever the box actually changes, which is the thing we care about.
+    const ro = new ResizeObserver(sync)
+    ro.observe(document.documentElement)
 
     const onTouch = () => setTouch(true)
     window.addEventListener('touchstart', onTouch, { once: true })
 
     return () => {
       uninstall()
-      mq.removeEventListener('change', sync)
+      ro.disconnect()
       rm.removeEventListener('change', sync)
-      window.removeEventListener('resize', sync)
-      window.removeEventListener('orientationchange', sync)
       window.removeEventListener('touchstart', onTouch)
     }
   }, [])
@@ -72,11 +72,7 @@ export default function App() {
             <FloorPicker />
             <TransitionVeil />
             {showTouch && <TouchControls />}
-            {mobile && (
-              <button className="swap-btn" onClick={() => setSwapped((s) => !s)}>
-                {swapped ? 'Show phone' : 'Full map'}
-              </button>
-            )}
+            {mobile && <SwapButton swapped={swapped} onToggle={() => setSwapped((v) => !v)} />}
           </>
         )}
       </div>

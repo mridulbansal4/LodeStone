@@ -8,6 +8,7 @@ import { FloorEventCard, MemoryCard, ToastLine, Morph } from './states/Cards'
 import { RouteOverviewSheet, CarFound } from './states/Overlays'
 import { findMyCar } from '../sim/actions'
 import { SIM } from '../sim/constants'
+import { LayersIcon } from '../ui/icons'
 
 /**
  * The 13-state router for the simulated phone screen.
@@ -60,6 +61,9 @@ export function PhoneScreen() {
 
       <div className="map-chips">
         <div className="floor-chip">
+          <span className="chip-icon" aria-hidden="true">
+            <LayersIcon size={15} />
+          </span>
           <b>{floorLbl}</b>
           <span>{floorNm.replace(/^\S+\s/, '')}</span>
         </div>

@@ -21,6 +21,13 @@
   --r-lg: 22px;
   --r-phone: 38px;
 
+  /* Control feedback. Press responds on pointer-down and is deliberately
+     short: the moment feedback lags, directness falls off a cliff. */
+  --t-press: 100ms;
+  --t-hover: 150ms;
+  --press-scale: 0.97;
+  --ease-out: cubic-bezier(0.16, 0.84, 0.44, 1);
+
   --t-fast: 180ms;
   --t-mid: 320ms;
   --t-slow: 900ms;

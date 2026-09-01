@@ -4,7 +4,7 @@ import { CAR, SPAWN } from '../world/maps'
 import { toScreenX, toScreenY } from '../world/iso'
 import { resetMetrics } from './metrics'
 import { buildRoute, startGuidance } from './navigation'
-import { setUi } from './store'
+import { setUi, syncUI } from './store'
 
 /**
  * Places the camera over the parked car on B3 without starting the demo, so
@@ -38,6 +38,7 @@ export function startDemo() {
   sim.started = true
   setPhase('parked')
   setUi({ showLegend: false })
+  syncUI()
 }
 
 export function restart() {
@@ -46,6 +47,7 @@ export function restart() {
   resetMetrics()
   sim.ui.reducedMotion = rm
   setUi({ showLegend: false })
+  syncUI()
 }
 
 /** Whether there is enough of a walk to be worth remembering. */
@@ -58,14 +60,17 @@ export function findMyCar() {
   if (sim.phase === 'findMyCar' || sim.phase === 'routeOverview' || sim.nav.active) return
   if (!memoryReady()) {
     toast('Keep walking - building memory')
+    syncUI()
     return
   }
   buildRoute()
   setPhase('findMyCar')
+  syncUI()
 }
 
 export function beginGuidance() {
   if (sim.phase !== 'routeOverview') return
   startGuidance()
   setPhase('returnNav')
+  syncUI()
 }

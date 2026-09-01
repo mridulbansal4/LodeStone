@@ -82,23 +82,82 @@ button {
 
 /* ---------- world overlays ---------- */
 
-.floor-badge {
+/*
+ * Control craft, applied uniformly:
+ *  - feedback lands on pointer-down (:active fires then, not on release)
+ *  - press is scale(0.97) over 100ms; hover is slower at 150ms
+ *  - small icon buttons carry invisible hit padding past their visual bounds
+ *  - reduced motion drops the transform and fades opacity instead
+ */
+
+.hud-chip,
+.icon-btn,
+.floor-btn,
+.touch-buttons button,
+.start,
+.cta,
+.btn-filled,
+.btn-tonal {
+  transition:
+    transform var(--t-press) var(--ease-out),
+    background-color var(--t-hover) var(--ease-out),
+    border-color var(--t-hover) var(--ease-out),
+    color var(--t-hover) var(--ease-out),
+    opacity var(--t-hover) var(--ease-out);
+}
+
+button:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:active:not(:disabled) {
+    transform: none;
+    opacity: 0.72;
+    transition: opacity 200ms ease;
+  }
+}
+
+/* Surfaces floating over the world share one material. */
+.hud-chip {
   position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 38px;
+  padding: 0 13px;
+  background: rgba(16, 21, 34, 0.9);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 6px 18px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(10px);
+  font-size: 13px;
+  color: var(--text-lo);
+}
+
+.hud-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: var(--accent);
+}
+
+.floor-badge {
   top: 16px;
   left: 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 14px;
-  background: rgba(18, 24, 39, 0.86);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  backdrop-filter: blur(8px);
+}
+
+.floor-badge-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
 }
 
 .floor-badge b {
-  font-size: 17px;
-  letter-spacing: 0.04em;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: var(--text-hi);
 }
 
 .floor-badge span {
@@ -106,31 +165,47 @@ button {
   color: var(--text-lo);
 }
 
-.zoom-controls {
+.hud-cluster {
   position: absolute;
   top: 16px;
   right: 16px;
   display: flex;
-  gap: 6px;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: rgba(16, 21, 34, 0.9);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 6px 18px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(10px);
 }
 
-.zoom-controls button,
 .icon-btn {
-  width: 38px;
-  height: 38px;
+  position: relative;
   display: grid;
   place-items: center;
-  background: rgba(18, 24, 39, 0.86);
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm);
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
   color: var(--text-lo);
-  font-size: 16px;
 }
 
-.zoom-controls button:hover,
+/* Invisible hit padding, so the target clears the 44px floor without
+   inflating the visual weight of the control. */
+.icon-btn::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+}
+
 .icon-btn:hover {
+  background: rgba(147, 160, 192, 0.1);
   color: var(--text-hi);
-  border-color: var(--accent);
+}
+
+.icon-btn.is-on {
+  background: var(--accent-dim);
+  color: var(--accent);
 }
 
 .use-prompt {
@@ -141,19 +216,27 @@ button {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 11px 18px;
-  background: rgba(18, 24, 39, 0.94);
-  border: 1px solid var(--accent);
-  border-radius: var(--r-md);
-  font-size: 14px;
+  height: 40px;
+  padding: 0 8px 0 13px;
+  background: rgba(16, 21, 34, 0.94);
+  border: 1px solid rgba(77, 225, 193, 0.42);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 22px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  font-size: 13.5px;
+  color: var(--text-hi);
   animation: rise var(--t-fast) var(--ease);
 }
 
 .use-prompt kbd {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
   background: var(--accent);
   color: #06231d;
-  border-radius: 5px;
-  padding: 2px 7px;
+  border-radius: 6px;
   font-weight: 700;
   font-family: var(--font);
   font-size: 12px;
@@ -165,24 +248,42 @@ button {
   bottom: 16px;
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 10px;
-  max-width: 420px;
-  padding: 10px 12px;
-  background: rgba(18, 24, 39, 0.78);
+  gap: 7px 14px;
+  max-width: 430px;
+  padding: 12px 14px;
+  background: rgba(16, 21, 34, 0.9);
   border: 1px solid var(--line);
-  border-radius: var(--r-md);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
   font-size: 11.5px;
   color: var(--text-lo);
+  animation: rise-y var(--t-fast) var(--ease);
 }
 
-.key-legend kbd {
+.key-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.key-legend kbd,
+.floor-btn kbd {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
   background: var(--bg-raised);
   border: 1px solid var(--line);
-  border-radius: 4px;
-  padding: 1px 6px;
+  border-radius: 5px;
   color: var(--text-hi);
   font-family: var(--font);
   font-size: 11px;
+  font-weight: 600;
+}
+
+.key-legend span kbd:last-of-type {
+  margin-right: 4px;
 }
 
 .world-toast {
@@ -190,13 +291,17 @@ button {
   left: 50%;
   top: 74px;
   transform: translateX(-50%);
-  padding: 10px 18px;
-  border-radius: 999px;
-  background: rgba(77, 225, 193, 0.14);
-  border: 1px solid var(--accent);
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 11px;
+  background: rgba(77, 225, 193, 0.13);
+  border: 1px solid rgba(77, 225, 193, 0.45);
   color: var(--accent);
   font-size: 13px;
   font-weight: 600;
+  backdrop-filter: blur(10px);
   animation: rise var(--t-fast) var(--ease);
 }
 
@@ -205,22 +310,47 @@ button {
   inset: 0;
   display: grid;
   place-items: center;
-  background: rgba(8, 11, 20, 0.6);
-  backdrop-filter: blur(3px);
+  background: rgba(8, 11, 20, 0.62);
+  backdrop-filter: blur(4px);
+  animation: fade var(--t-fast) var(--ease);
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .floor-picker-card {
-  padding: 20px;
+  padding: 22px;
   background: var(--bg-surface);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
   text-align: center;
-  min-width: 240px;
+  min-width: 260px;
+  animation: rise-c var(--t-mid) var(--ease);
+}
+
+@keyframes rise-c {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .floor-picker-card h4 {
   margin: 0 0 4px;
   font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
 }
 
 .floor-picker-card p {
@@ -237,12 +367,20 @@ button {
 
 .floor-btn {
   flex: 1;
-  padding: 13px 0;
-  border-radius: var(--r-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 13px 0 11px;
+  border-radius: 11px;
   background: var(--bg-raised);
   border: 1px solid var(--line);
-  font-weight: 700;
-  font-size: 15px;
+}
+
+.floor-btn b {
+  font-weight: 650;
+  font-size: 16px;
+  letter-spacing: 0.01em;
 }
 
 .floor-btn:hover {
@@ -260,16 +398,20 @@ button {
   animation: veil var(--t-slow) var(--ease);
 }
 
+.veil-inner {
+  text-align: center;
+}
+
 .transition-veil .ticker {
-  font-size: 44px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-size: 46px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   color: var(--accent);
 }
 
 .transition-veil .sub {
-  margin-top: 8px;
-  font-size: 13px;
+  margin-top: 10px;
+  font-size: 12.5px;
   color: var(--text-lo);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -296,6 +438,17 @@ button {
   to {
     opacity: 1;
     transform: translate(-50%, 0);
+  }
+}
+
+@keyframes rise-y {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -412,6 +565,10 @@ button {
 
 .start:hover {
   background: #6bf0d5;
+}
+
+.start:active {
+  transform: scale(var(--press-scale));
 }
 
 .start svg {
@@ -629,16 +786,9 @@ button {
 }
 
 .swap-btn {
-  position: absolute;
   right: 16px;
   top: 16px;
   z-index: 20;
-  padding: 9px 14px;
-  border-radius: var(--r-md);
-  background: rgba(18, 24, 39, 0.92);
-  border: 1px solid var(--line);
-  font-size: 12px;
-  color: var(--text-lo);
 }
 
 /* The world panel is short on a phone, so the controls get proportionally

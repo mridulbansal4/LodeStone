@@ -258,12 +258,18 @@
 
 .floor-chip {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: 6px;
   padding: 7px 13px;
   border-radius: 10px;
   background: var(--m-surface-container-high);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.floor-chip .chip-icon {
+  display: grid;
+  place-items: center;
+  color: var(--m-primary);
 }
 
 .floor-chip b {
@@ -572,7 +578,24 @@
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.01em;
-  transition: filter var(--t-fast) var(--ease), opacity var(--t-fast) var(--ease);
+  transition:
+    transform var(--t-press) var(--ease-out),
+    filter var(--t-hover) var(--ease-out),
+    background-color var(--t-hover) var(--ease-out),
+    opacity var(--t-hover) var(--ease-out);
+}
+
+.btn-filled:active:not(:disabled),
+.btn-tonal:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-filled:active:not(:disabled),
+  .btn-tonal:active:not(:disabled) {
+    transform: none;
+    opacity: 0.72;
+  }
 }
 
 .btn-filled {

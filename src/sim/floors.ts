@@ -1,6 +1,7 @@
 import { SIM } from './constants'
 import { sim, Floor, floorLabel, setPhase, TransitionType } from './state'
 import { padUnder, padSpot } from '../world/maps'
+import { syncUI } from './store'
 import { pushSample } from './trail'
 
 /** Keep the "you can use this" prompt in sync with where the player stands. */
@@ -26,6 +27,7 @@ export function requestTransition() {
     startTransition(targets[0])
   } else if (targets.length > 1) {
     sim.ui.floorPicker = true
+    syncUI()
   }
 }
 
@@ -53,6 +55,7 @@ export function startTransition(to: Floor) {
   })
 
   setPhase('floorTransition')
+  syncUI()
 }
 
 /** Runs the transition animation and lands the player on the target floor. */
