@@ -10,6 +10,8 @@ import { findMyCar } from '../sim/actions'
 import { SIM } from '../sim/constants'
 import { LayersIcon } from '../ui/icons'
 
+import { OriginHomeScreen } from './OriginHomeScreen'
+
 /**
  * The 13-state router for the simulated phone screen.
  *
@@ -29,8 +31,10 @@ export function PhoneScreen() {
   const overview = phase === 'routeOverview'
   const ready = distance >= SIM.MEMORY_MIN_DIST
 
-  // State 1 - Landing. The phone is asleep; it wakes when the demo starts.
-  if (phase === 'landing') return <div className="phone-screen asleep" />
+  // State 1 - Landing. Shows authentic iQOO 15 OriginOS 6 Home Screen with Park Trace app installed.
+  if (phase === 'landing') {
+    return <OriginHomeScreen />
+  }
 
   return (
     <div className="phone-screen">

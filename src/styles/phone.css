@@ -9,73 +9,465 @@
    mirroring anywhere in this prototype.
    ============================================================ */
 
-/* ---------- device chassis ---------- */
+/* ---------- iQOO 15 device chassis ---------- */
 
-/* Height-driven with a fixed aspect ratio, so a short viewport shortens the
-   handset instead of squashing it out of proportion. */
+/* Height-driven with a fixed aspect ratio matching official iQOO 15 (163.65mm x 76.80mm, 22:10 display) */
 .device {
   position: relative;
   width: auto;
   height: min(786px, 100%);
-  aspect-ratio: 372 / 786;
+  aspect-ratio: 372 / 792;
   flex: 0 0 auto;
 }
 
-/* Side keys, machined slightly proud of the rail. */
+/* Side keys on right rail, machined CNC aluminium */
 .device .key {
   position: absolute;
   right: -2.5px;
   width: 3px;
   border-radius: 0 2px 2px 0;
-  background: linear-gradient(180deg, #6d7480 0%, #414855 40%, #2b313b 100%);
+  background: linear-gradient(180deg, #626a77 0%, #383e49 50%, #252a32 100%);
   box-shadow: 1px 0 2px rgba(0, 0, 0, 0.5);
 }
 
 .device .key-volume {
-  top: 172px;
-  height: 96px;
+  top: 160px;
+  height: 92px;
 }
 
 .device .key-power {
-  top: 292px;
-  height: 58px;
-  background: linear-gradient(180deg, #7d848f 0%, #4b525e 40%, #333944 100%);
+  top: 275px;
+  height: 52px;
+  background: linear-gradient(180deg, #747d8b 0%, #444b57 50%, #2c323b 100%);
 }
 
-/* Aluminium rail. Its padding is the bezel. */
+/* Flagship Aerospace Aluminium Rail & Symmetrical 1.4mm Bezel */
 .device-body {
   position: relative;
   width: 100%;
   height: 100%;
-  padding: 8px;
-  border-radius: 46px;
-  background: linear-gradient(148deg, #8b93a1 0%, #3a414e 18%, #22272f 52%, #464d59 82%, #7b8391 100%);
+  padding: 5px;
+  border-radius: 40px;
+  background: linear-gradient(150deg, #424954 0%, #1d2127 22%, #111419 55%, #252b34 82%, #404853 100%);
   box-shadow:
-    0 40px 80px -20px rgba(0, 0, 0, 0.7),
-    0 2px 4px rgba(0, 0, 0, 0.4),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.09);
+    0 40px 80px -20px rgba(0, 0, 0, 0.75),
+    0 2px 6px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16);
 }
 
 .device-screen {
   position: relative;
   height: 100%;
-  border-radius: 38px;
+  border-radius: 35px;
   overflow: hidden;
   background: #000;
-  box-shadow: inset 0 0 0 1.5px #05070a;
+  box-shadow: inset 0 0 0 1px #040608;
 }
 
 .punch-hole {
   position: absolute;
-  top: 13px;
+  top: 11px;
   left: 50%;
   transform: translateX(-50%);
-  width: 11px;
-  height: 11px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: #05070a;
-  box-shadow: inset 0 0 0 1px rgba(120, 132, 150, 0.5);
+  background: #020305;
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.08), inset 0 0 0 1px rgba(0, 0, 0, 0.9);
   z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.punch-hole-lens {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #28426b 0%, #10192e 60%, #050810 100%);
+  box-shadow: inset 0 0 1px rgba(130, 180, 255, 0.6);
+}
+
+/* ---------- OriginOS 6 Ultra-HD Home Screen (iQOO 15) ---------- */
+
+.originos-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  user-select: none;
+  isolation: isolate;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+.originos-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.originos-glass-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 35;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0) 55%
+  );
+}
+
+/* Status Bar */
+.originos-status-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  padding: 6px 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 20;
+  color: #ffffff;
+}
+
+.originos-status-time {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.originos-status-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.originos-status-svg {
+  width: 13px;
+  height: 13px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+
+.originos-battery {
+  display: flex;
+  align-items: center;
+}
+
+.originos-battery-body {
+  width: 19px;
+  height: 10px;
+  border-radius: 3px;
+  border: 1.2px solid rgba(255, 255, 255, 0.9);
+  padding: 1px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.originos-battery-fill {
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  border-radius: 1.5px;
+}
+
+.originos-battery-cap {
+  width: 1.5px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 0 1px 1px 0;
+  margin-left: 0.5px;
+}
+
+/* Large Clock & Weather Widget */
+.originos-widget-clock {
+  position: absolute;
+  top: 11.5%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 20;
+  color: #ffffff;
+  pointer-events: none;
+}
+
+.originos-clock-digits {
+  font-size: clamp(46px, 5.8vh, 56px);
+  font-weight: 350;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+}
+
+.originos-clock-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
+}
+
+.originos-meta-dot {
+  opacity: 0.6;
+}
+
+.originos-weather-icon {
+  display: flex;
+  align-items: center;
+}
+
+/* App Grid */
+.originos-app-grid {
+  position: absolute;
+  top: 66%;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 0 10px;
+  gap: 6px;
+  z-index: 20;
+}
+
+.originos-app-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: default;
+  text-decoration: none;
+}
+
+.originos-app-icon {
+  width: clamp(44px, 5.8vh, 52px);
+  height: clamp(44px, 5.8vh, 52px);
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.25);
+}
+
+.originos-app-icon .icon-svg {
+  width: 72%;
+  height: 72%;
+  display: block;
+}
+
+.originos-app-icon .icon-img-asset {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 13px;
+  display: block;
+}
+
+/* App-Specific Gradient Backgrounds */
+.icon-clock {
+  background: #ffffff;
+}
+
+.icon-albums {
+  background: linear-gradient(145deg, #7ad3ff 0%, #3ca6fa 50%, #20b88e 100%);
+}
+
+.icon-parktrace {
+  background: linear-gradient(150deg, #18202b 0%, #0d1219 100%);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(243, 115, 56, 0.45);
+}
+
+.icon-settings {
+  background: linear-gradient(145deg, #f1f5f9 0%, #cbd5e1 100%);
+}
+
+.originos-app-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+}
+
+/* Park Trace Hero App Touch Target */
+.app-hero-parktrace {
+  cursor: pointer;
+  position: relative;
+  transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  outline: none;
+}
+
+.app-hero-parktrace:hover {
+  transform: scale(1.08);
+}
+
+.app-hero-parktrace:active {
+  transform: scale(0.92);
+}
+
+.app-hero-parktrace .icon-rim-glow {
+  position: absolute;
+  inset: -3px;
+  border-radius: 16px;
+  border: 1.5px solid rgba(243, 115, 56, 0);
+  transition: all 200ms ease;
+  pointer-events: none;
+}
+
+.app-hero-parktrace:hover .icon-rim-glow {
+  border-color: rgba(243, 115, 56, 0.85);
+  box-shadow: 0 0 14px rgba(243, 115, 56, 0.6);
+}
+
+.originos-badge-launch {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: rgba(20, 20, 19, 0.94);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 2px 7px;
+  border-radius: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease, transform 150ms ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  z-index: 30;
+}
+
+.app-hero-parktrace:hover .originos-badge-launch {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Pagination Dots */
+.originos-pagination {
+  position: absolute;
+  bottom: 15.5%;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.originos-page-dash {
+  width: 12px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 2px;
+}
+
+.originos-page-dot {
+  width: 3px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+}
+
+/* Bottom Dock */
+.originos-dock {
+  position: absolute;
+  bottom: 4%;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 0 10px;
+  gap: 6px;
+  z-index: 20;
+}
+
+.dock-phone {
+  background: linear-gradient(145deg, #4ade80 0%, #22c55e 100%);
+}
+
+.dock-messages {
+  background: linear-gradient(145deg, #a78bfa 0%, #f472b6 50%, #fb923c 100%);
+}
+
+.dock-browser {
+  background: linear-gradient(145deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
+}
+
+.dock-camera {
+  background: #ffffff;
+}
+
+.camera-outer-lens {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #0f172a;
+}
+
+.camera-inner-glass {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #3b82f6 0%, #0f172a 70%, #020617 100%);
+  position: relative;
+}
+
+.camera-specular {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ffffff;
+  opacity: 0.85;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+}
+
+/* Bottom Gesture Pill */
+.originos-gesture-pill {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 88px;
+  height: 3.5px;
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 2px;
+  z-index: 30;
+  pointer-events: none;
 }
 
 /* ---------- Material 3 dark scheme ---------- */
