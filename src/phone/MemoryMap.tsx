@@ -23,11 +23,12 @@ const MW = Math.ceil(MAP_W / CELL)
 const MH = Math.ceil(MAP_H / CELL)
 
 /**
- * Coarse floor plate per level: the shape of the level, not its contents.
+ * Coarse floor plate per level.
  *
- * A cell counts as floor if any meaningful part of it is walkable. Requiring
- * most of the cell punched a hole through every parked bay and turned B3 into
- * speckle; at this size the outline is the information, and the cars are noise.
+ * The threshold is deliberately strict: a cell has to be mostly walkable to
+ * count. That punches a hole through every parked bay, which is the point -
+ * the rows of gaps are what make B3 read as a car park rather than a blank
+ * slab, and they show the shape of the aisles you actually walked down.
  */
 function mask(f: Floor): Uint8Array {
   const hit = maskCache.get(f)
@@ -42,21 +43,11 @@ function mask(f: Floor): Uint8Array {
           if (isWalkable(g[idx(x, y)])) n++
         }
       }
-      m[cy * MW + cx] = n > CELL * CELL * 0.12 ? 1 : 0
+      m[cy * MW + cx] = n > CELL * CELL * 0.4 ? 1 : 0
     }
   }
-  // Close the remaining pinholes: a cell surrounded on both axes is floor.
-  const closed = new Uint8Array(m)
-  for (let cy = 1; cy < MH - 1; cy++) {
-    for (let cx = 1; cx < MW - 1; cx++) {
-      if (m[cy * MW + cx]) continue
-      const h = m[cy * MW + cx - 1] && m[cy * MW + cx + 1]
-      const v = m[(cy - 1) * MW + cx] && m[(cy + 1) * MW + cx]
-      if (h && v) closed[cy * MW + cx] = 1
-    }
-  }
-  maskCache.set(f, closed)
-  return closed
+  maskCache.set(f, m)
+  return m
 }
 
 function floorOffset(f: Floor) {
@@ -227,9 +218,9 @@ function drawPlate(ctx: CanvasRenderingContext2D, f: Floor, relevant: boolean) {
   ctx.globalAlpha = active ? 0.95 : relevant ? 0.5 : 0.2
   ctx.fillStyle = active ? '#26334F' : '#1A2235'
 
-  // Overlap the diamonds very slightly so neighbouring cells fuse into one
-  // slab instead of showing hairline seams at fractional scales.
-  const e = 0.6
+  // Only a hair of overlap: enough to kill seams between neighbouring cells,
+  // not enough to swallow the single-cell bay holes.
+  const e = 0.22
   for (let cy = 0; cy < MH; cy++) {
     for (let cx = 0; cx < MW; cx++) {
       if (!m[cy * MW + cx]) continue
@@ -248,9 +239,9 @@ function drawPlate(ctx: CanvasRenderingContext2D, f: Floor, relevant: boolean) {
   }
 
   // Lit south edge: a cell with nothing below it is the front lip of the slab.
-  ctx.globalAlpha = active ? 0.7 : 0.28
+  ctx.globalAlpha = active ? 0.42 : 0.18
   ctx.strokeStyle = active ? '#4A5E8C' : '#2C3852'
-  ctx.lineWidth = 1.1
+  ctx.lineWidth = 0.9
   ctx.beginPath()
   for (let cy = 0; cy < MH; cy++) {
     for (let cx = 0; cx < MW; cx++) {
