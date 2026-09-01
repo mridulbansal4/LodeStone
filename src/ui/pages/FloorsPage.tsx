@@ -38,7 +38,7 @@ export function FloorsPage() {
           One walk. Three floors. <br/><span className="mc-hero-em">One remembered route.</span>
         </h1>
         <p className="mc-hero-deck">
-          Park Trace remembers the movement from your parking spot through the garage — even when GPS disappears.
+          Park Trace remembers the movement from your parking spot through the garage, even when GPS disappears.
         </p>
       </div>
 
@@ -132,7 +132,7 @@ export function FloorsPage() {
             </div>
             <div className="mc-step-content">
               <h3>It starts when you leave the car.</h3>
-              <p>The prototype combines contextual signals—like Bluetooth disconnection and activity transitions—to confidently infer a parking-to-walking event.</p>
+              <p>The prototype combines contextual signals such as Bluetooth disconnection and activity transitions to confidently infer a parking-to-walking event.</p>
               
               <div className="mc-step-detail" style={{ fontSize: '12.5px', color: 'var(--mc-ink-black)', fontWeight: 600 }}>
                 Bluetooth disconnect <span style={{ color: 'var(--mc-dust-taupe)' }}>&rarr;</span> Walking

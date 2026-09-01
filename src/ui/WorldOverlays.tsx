@@ -1,6 +1,7 @@
 import { useUi, setUi } from '../sim/store'
 import { sim, floorLabel, Floor } from '../sim/state'
 import { startTransition } from '../sim/floors'
+import { restart } from '../sim/actions'
 import { nudgeZoom } from '../world/camera'
 import {
   LayersIcon,
@@ -11,7 +12,24 @@ import {
   StairsIcon,
   EscalatorIcon,
   SwapIcon,
+  ArrowLeftIcon,
 } from './icons'
+
+/**
+ * Leaves the demo and returns to the main menu. This is a full reset, which is
+ * the honest behaviour: you are ending the run, so the recorded walk goes with
+ * it rather than lingering behind the marketing pages.
+ */
+export function BackToMenu() {
+  return (
+    <button className="hud-chip back-btn" onClick={restart} aria-label="Back to main menu">
+      <span className="hud-icon" aria-hidden="true">
+        <ArrowLeftIcon size={16} />
+      </span>
+      Back to menu
+    </button>
+  )
+}
 
 export function FloorBadge() {
   const lbl = useUi((s) => s.floorLbl)
@@ -138,7 +156,7 @@ export function KeyLegend() {
     [['E'], 'lift / stairs'],
     [['F'], 'find my car'],
     [['G'], 'start guidance'],
-    [['R'], 'restart'],
+    [['R'], 'back to menu'],
     [['+', '−'], 'zoom'],
   ]
   return (

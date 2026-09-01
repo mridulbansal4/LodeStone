@@ -16,7 +16,7 @@ export function Overview() {
 
         <p className="mc-hero-deck">
           GPS dies under a concrete deck, so a dropped pin lands back at the ramp. Walk away from the car
-          here and the phone records the route on its own &mdash; then guides you back through three floors
+          here and the phone records the route on its own, then guides you back through three floors
           of mall.
         </p>
 
