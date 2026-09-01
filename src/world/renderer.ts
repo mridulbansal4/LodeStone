@@ -1,6 +1,6 @@
 import { sim } from '../sim/state'
 import { getMap, MAP_W, MAP_H } from './maps'
-import { idx } from './maps/build'
+import { idx, ELEV } from './maps/build'
 import { T, HEIGHT, COLOR, isWalkable, tileTint } from './tiles'
 import { HW, HH, LIFT, toScreenX, toScreenY, shade } from './iso'
 import { drawVehicle, pickModel, pickPaint, pickFlip } from './vehicles'
@@ -56,6 +56,7 @@ export function render(ctx: CanvasRenderingContext2D, vw: number, vh: number) {
   drawTrail(ctx)
   drawRoute(ctx)
   drawPropLayer(ctx, map.grid, x0, x1, y0, y1)
+  drawPadBeacons(ctx)
   drawLabels(ctx)
 
   ctx.restore()
@@ -98,8 +99,9 @@ function drawPads(ctx: CanvasRenderingContext2D) {
   const map = getMap(sim.player.floor)
   const pulse = 0.5 + 0.5 * Math.sin(sim.time / 380)
   for (const p of map.pads) {
+    const lift = p.type === 'ELEVATOR'
     ctx.save()
-    ctx.globalAlpha = 0.25 + pulse * 0.3
+    ctx.globalAlpha = (lift ? 0.26 : 0.2) + pulse * (lift ? 0.26 : 0.22)
     ctx.fillStyle = ACCENT
     for (let y = p.y; y < p.y + p.h; y++) {
       for (let x = p.x; x < p.x + p.w; x++) {
@@ -107,6 +109,99 @@ function drawPads(ctx: CanvasRenderingContext2D) {
         ctx.fill()
       }
     }
+    ctx.restore()
+
+    // Corner brackets: they give the pad a machined edge, which reads as a
+    // marked threshold rather than a stain on the floor.
+    ctx.save()
+    ctx.globalAlpha = 0.85
+    ctx.strokeStyle = ACCENT
+    ctx.lineWidth = 2
+    ctx.lineCap = 'round'
+    const corners: [number, number, number, number][] = [
+      [p.x, p.y, 1, 1],
+      [p.x + p.w, p.y, -1, 1],
+      [p.x, p.y + p.h, 1, -1],
+      [p.x + p.w, p.y + p.h, -1, -1],
+    ]
+    for (const [cx, cy, dx, dy] of corners) {
+      const ax = toScreenX(cx, cy)
+      const ay = toScreenY(cx, cy) + HH
+      const bx = toScreenX(cx + dx * 1.1, cy)
+      const by = toScreenY(cx + dx * 1.1, cy) + HH
+      const ex = toScreenX(cx, cy + dy * 1.1)
+      const ey = toScreenY(cx, cy + dy * 1.1) + HH
+      ctx.beginPath()
+      ctx.moveTo(bx, by)
+      ctx.lineTo(ax, ay)
+      ctx.lineTo(ex, ey)
+      ctx.stroke()
+    }
+    ctx.restore()
+  }
+}
+
+/**
+ * Drawn after the props, so the lift stays findable from anywhere on the deck:
+ * a light column rising out of the shaft and a badge floating above it.
+ */
+function drawPadBeacons(ctx: CanvasRenderingContext2D) {
+  const map = getMap(sim.player.floor)
+  const pulse = 0.5 + 0.5 * Math.sin(sim.time / 700)
+  for (const p of map.pads) {
+    if (p.type !== 'ELEVATOR') continue
+    const cx = p.x + p.w / 2
+    const cy = p.y + p.h / 2
+    const bx = toScreenX(cx, cy)
+    const by = toScreenY(cx, cy) + HH
+
+    // Light column.
+    const top = by - 7.2 * LIFT
+    const grad = ctx.createLinearGradient(0, by, 0, top)
+    grad.addColorStop(0, 'rgba(77,225,193,0.30)')
+    grad.addColorStop(0.55, 'rgba(77,225,193,0.10)')
+    grad.addColorStop(1, 'rgba(77,225,193,0)')
+    ctx.save()
+    ctx.fillStyle = grad
+    ctx.beginPath()
+    ctx.moveTo(bx - HW * 1.5, by)
+    ctx.lineTo(bx + HW * 1.5, by)
+    ctx.lineTo(bx + HW * 0.5, top)
+    ctx.lineTo(bx - HW * 0.5, top)
+    ctx.closePath()
+    ctx.fill()
+    ctx.restore()
+
+    // Floating badge with the lift glyph.
+    const badgeY = by - 5.4 * LIFT + Math.sin(sim.time / 620) * 3
+    ctx.save()
+    ctx.globalAlpha = 0.55 + pulse * 0.35
+    ctx.fillStyle = ACCENT
+    ctx.beginPath()
+    ctx.arc(bx, badgeY, 13, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.globalAlpha = 1
+    ctx.fillStyle = '#0B0F1A'
+    ctx.beginPath()
+    ctx.arc(bx, badgeY, 11, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.strokeStyle = ACCENT
+    ctx.lineWidth = 1.7
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+    // Up and down arrows: the universal lift mark.
+    ctx.beginPath()
+    ctx.moveTo(bx - 3.4, badgeY + 5)
+    ctx.lineTo(bx - 3.4, badgeY - 5)
+    ctx.moveTo(bx - 6.2, badgeY - 2.2)
+    ctx.lineTo(bx - 3.4, badgeY - 5)
+    ctx.lineTo(bx - 0.6, badgeY - 2.2)
+    ctx.moveTo(bx + 3.4, badgeY - 5)
+    ctx.lineTo(bx + 3.4, badgeY + 5)
+    ctx.moveTo(bx + 0.6, badgeY + 2.2)
+    ctx.lineTo(bx + 3.4, badgeY + 5)
+    ctx.lineTo(bx + 6.2, badgeY + 2.2)
+    ctx.stroke()
     ctx.restore()
   }
 }
@@ -420,6 +515,29 @@ function drawBox(ctx: CanvasRenderingContext2D, x: number, y: number, h: number,
   ctx.fillStyle = top
   diamond(ctx, x, y, lift)
   ctx.fill()
+
+  // Doors only on the back wall. Repeating them down the flanks turns the
+  // shaft into a picket fence.
+  if (t === T.LIFT_WALL && y === ELEV.y - 1 && x > ELEV.x - 1 && x < ELEV.x + ELEV.w) {
+    ctx.save()
+    ctx.globalAlpha = 0.9
+    ctx.fillStyle = '#101722'
+    ctx.beginPath()
+    ctx.moveTo(tx - HW * 0.78, ty + HH * 0.22 - lift * 0.86)
+    ctx.lineTo(tx, ty + TILE_H * 0.72 - lift * 0.86)
+    ctx.lineTo(tx, ty + TILE_H * 0.72 - lift * 0.1)
+    ctx.lineTo(tx - HW * 0.78, ty + HH * 0.22 - lift * 0.1)
+    ctx.closePath()
+    ctx.fill()
+    ctx.globalAlpha = 0.5 + 0.5 * Math.sin(sim.time / 520)
+    ctx.strokeStyle = ACCENT
+    ctx.lineWidth = 1.4
+    ctx.beginPath()
+    ctx.moveTo(tx - HW * 0.39, ty + HH * 0.47 - lift * 0.86)
+    ctx.lineTo(tx - HW * 0.39, ty + HH * 0.47 - lift * 0.1)
+    ctx.stroke()
+    ctx.restore()
+  }
 
   if (t === T.SIGN) {
     ctx.save()

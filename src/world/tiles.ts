@@ -18,6 +18,7 @@ export const T = {
   SIGN: 14,
   KIOSK: 15,
   DECK: 16,
+  LIFT_WALL: 17,
 } as const
 
 export type TileId = (typeof T)[keyof typeof T]
@@ -40,6 +41,7 @@ export function isWalkable(t: number): boolean {
 /** Extrusion height in metres. 0 = flat, drawn as a plain diamond. */
 export const HEIGHT: Record<number, number> = {
   [T.WALL]: 3.0,
+  [T.LIFT_WALL]: 3.4,
   [T.STORE]: 3.4,
   [T.GLASS]: 2.6,
   [T.PLANTER]: 0.7,
@@ -57,6 +59,7 @@ export const COLOR: Record<number, string> = {
   [T.ROAD_MARK]: '#2C3556',
   [T.BAY]: '#202A46',
   [T.WALL]: '#2A3454',
+  [T.LIFT_WALL]: '#37506B',
   [T.STORE]: '#313D63',
   [T.GLASS]: '#3A6C8A',
   [T.PLANTER]: '#2F6B57',

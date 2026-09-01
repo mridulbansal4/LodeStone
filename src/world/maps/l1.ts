@@ -1,7 +1,7 @@
 // L1 - Mall concourse, food court, atrium base, entrance hall.
 
 import { T, isWalkable } from '../tiles'
-import { FloorMap, MAP_W, MAP_H, rect, outline, encase, idx, ELEV, STAIR, ESC } from './build'
+import { FloorMap, MAP_W, MAP_H, rect, outline, encase, idx, ELEV, STAIR, ESC, liftEnclosure } from './build'
 
 export function buildL1(): FloorMap {
   const g = new Uint8Array(MAP_W * MAP_H)
@@ -16,6 +16,7 @@ export function buildL1(): FloorMap {
   // Lift lobby - same grid coordinates on every floor.
   rect(g, 54, 26, 14, 12, T.FLOOR)
   rect(g, ELEV.x, ELEV.y, ELEV.w, ELEV.h, T.ELEV_PAD)
+  liftEnclosure(g)
 
   // Food court, north-east, with a connector down to the concourse.
   rect(g, 80, 8, 32, 28, T.FLOOR)
@@ -73,7 +74,7 @@ export function buildL1(): FloorMap {
     labels: [
       { x: 60, y: 45, text: 'L1 CONCOURSE', size: 14 },
       { x: 95, y: 20, text: 'FOOD COURT', size: 13 },
-      { x: 60, y: 24, text: 'LIFTS', size: 12 },
+      { x: 59.5, y: 24.5, text: 'LIFTS', size: 15 },
       { x: 26, y: 16, text: 'STAIRS', size: 11 },
       { x: 33, y: 55, text: 'ATRIUM', size: 12 },
       { x: 66, y: 72, text: 'ENTRANCE', size: 12 },

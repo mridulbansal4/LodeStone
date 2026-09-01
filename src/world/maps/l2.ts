@@ -1,7 +1,7 @@
 // L2 - Shopping: cinema, apparel court, balcony ring and the skybridge.
 
 import { T, isWalkable } from '../tiles'
-import { FloorMap, MAP_W, MAP_H, rect, outline, encase, idx, ELEV, STAIR, ESC } from './build'
+import { FloorMap, MAP_W, MAP_H, rect, outline, encase, idx, ELEV, STAIR, ESC, liftEnclosure } from './build'
 
 export function buildL2(): FloorMap {
   const g = new Uint8Array(MAP_W * MAP_H)
@@ -17,6 +17,7 @@ export function buildL2(): FloorMap {
   // Lift lobby - identical coordinates to B3 and L1.
   rect(g, 54, 26, 14, 12, T.FLOOR)
   rect(g, ELEV.x, ELEV.y, ELEV.w, ELEV.h, T.ELEV_PAD)
+  liftEnclosure(g)
 
   // Apparel court, east.
   rect(g, 78, 10, 34, 26, T.FLOOR)
@@ -73,7 +74,7 @@ export function buildL2(): FloorMap {
       { x: 60, y: 45, text: 'L2 SHOPPING', size: 14 },
       { x: 20, y: 20, text: 'CINEMA', size: 13 },
       { x: 94, y: 22, text: 'APPAREL', size: 13 },
-      { x: 60, y: 24, text: 'LIFTS', size: 12 },
+      { x: 59.5, y: 24.5, text: 'LIFTS', size: 15 },
       { x: 33, y: 56, text: 'SKYBRIDGE', size: 11 },
     ],
   }

@@ -89,5 +89,21 @@ export function encase(g: Uint8Array, walkable: (t: number) => boolean, wall: nu
 // grid coordinates across every floor is what makes the return route
 // continuous through the shaft with no special-casing.
 export const ELEV = { x: 57, y: 28, w: 5, h: 4 }
+
+/**
+ * Wraps the lift pad in a three-sided shaft with the opening facing south.
+ * Identical on every floor, both so the return route stays continuous through
+ * the shaft and so the lift is recognisable as architecture rather than as a
+ * glowing patch of floor.
+ */
+export function liftEnclosure(g: Uint8Array) {
+  const x0 = ELEV.x - 1
+  const x1 = ELEV.x + ELEV.w
+  const yBack = ELEV.y - 1
+  const yOpen = ELEV.y + ELEV.h // left open: this is how you walk in
+  rect(g, x0, yBack, ELEV.w + 2, 1, T.LIFT_WALL) // back
+  rect(g, x0, yBack, 1, yOpen - yBack, T.LIFT_WALL) // west flank
+  rect(g, x1, yBack, 1, yOpen - yBack, T.LIFT_WALL) // east flank
+}
 export const STAIR = { x: 22, y: 18, w: 4, h: 4 }
 export const ESC = { x: 50, y: 58, w: 4, h: 4 }

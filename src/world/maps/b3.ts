@@ -1,7 +1,7 @@
 // B3 - Parking. The origin of every route.
 
 import { T, isWalkable } from '../tiles'
-import { FloorMap, MAP_W, MAP_H, rect, outline, encase, idx, ELEV } from './build'
+import { FloorMap, MAP_W, MAP_H, rect, outline, encase, idx, ELEV, liftEnclosure } from './build'
 
 // The player's car. Deliberately ~50 m from the lift lobby: the walk has to be
 // long enough to actually be a memory.
@@ -42,6 +42,7 @@ export function buildB3(): FloorMap {
   // Lift lobby.
   rect(g, 54, 26, 14, 12, T.FLOOR)
   rect(g, ELEV.x, ELEV.y, ELEV.w, ELEV.h, T.ELEV_PAD)
+  liftEnclosure(g)
   g[idx(53, 31)] = T.SIGN
   g[idx(68, 31)] = T.SIGN
 
@@ -71,7 +72,7 @@ export function buildB3(): FloorMap {
     pads: [{ id: 'elev-main', type: 'ELEVATOR', ...ELEV, targets: [-3, 1, 2] }],
     labels: [
       { x: 20, y: 60, text: 'B3 PARKING', size: 16 },
-      { x: 60, y: 24, text: 'LIFTS', size: 12 },
+      { x: 59.5, y: 24.5, text: 'LIFTS', size: 15 },
       { x: 106, y: 74, text: 'SERVICE', size: 10 },
       { x: 108, y: 14, text: 'RAMP CLOSED', size: 10 },
     ],
