@@ -389,7 +389,7 @@ This satisfies the phone-first requirement using the same code path and the same
 
 | Constant | Value | Note |
 |---|---|---|
-| `WALK_SPEED` | `1.6 m/s` | Just above a real walking pace of ~1.4 **[Assumption]** |
+| `WALK_SPEED` | `1.8 m/s` | A brisk walk: above a real pace of ~1.4, well below a jog **[Assumption]** |
 | `SLOW_SPEED` | `0.8 m/s` | Shift held |
 | `ACCEL` | `18 m/s²` | Snappy but not instant |
 | `PLAYER_RADIUS` | `0.35 m` | Collision circle |
@@ -484,7 +484,7 @@ In Route Overview (before guidance starts) confidence displays **High** by defin
 
 ```js
 export const SIM = {
-  WALK_SPEED: 1.6, SLOW_SPEED: 0.8, ACCEL: 18, PLAYER_RADIUS: 0.35,
+  WALK_SPEED: 1.8, SLOW_SPEED: 0.8, ACCEL: 18, PLAYER_RADIUS: 0.35,
   TRAIL_SAMPLE_DIST: 1.5, TRAIL_SAMPLE_TIME: 400, MAX_SAMPLES: 4000,
   STRIDE_M: 0.72, FLOOR_TRANSITION_DIST: 6,
   TURN_THRESHOLD_DEG: 55, TURN_WINDOW_MS: 1200, TURN_COOLDOWN_MS: 1000,
@@ -996,7 +996,7 @@ Every judgement call made in this document, in one place. All are reversible.
 | A1 | Three floors (B3 / L1 / L2); L3 cut as cost without narrative gain | §5.2 |
 | A2 | 120 × 90 m grid per floor, 64 × 32 px iso tiles | §5.1 |
 | A3 | Camera damping 0.12/frame, no rotation, zoom 0.6–1.6× | §4.2 |
-| A4 | `WALK_SPEED = 1.6 m/s` - just above a real walking pace | §7.2 |
+| A4 | `WALK_SPEED = 1.8 m/s` - a brisk walk, tuned by feel | §7.2 |
 | A5 | `STRIDE_M = 0.72` fixed (the real product estimates per-user) | §7.5 |
 | A6 | `FLOOR_TRANSITION_DIST = 6 m` added per floor change | §7.4 |
 | A7 | Off-route 8 m / recover 4 m with hold timers; final values tuned in rehearsal | §7.10 |
