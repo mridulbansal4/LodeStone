@@ -108,9 +108,14 @@ function drawPads(ctx: CanvasRenderingContext2D) {
   }
 }
 
-function pathOnFloor(ctx: CanvasRenderingContext2D, pts: { x: number; y: number; floor: number }[]) {
+function pathOnFloor(
+  ctx: CanvasRenderingContext2D,
+  pts: { x: number; y: number; floor: number }[],
+  reverse = false,
+) {
   let started = false
-  for (const p of pts) {
+  for (let k = 0; k < pts.length; k++) {
+    const p = pts[reverse ? pts.length - 1 - k : k]
     if (p.floor !== sim.player.floor) {
       started = false
       continue
@@ -147,9 +152,22 @@ function drawTrail(ctx: CanvasRenderingContext2D) {
   ctx.restore()
 }
 
+/**
+ * The return route.
+ *
+ * Drawn along the RAW recorded trail played backwards - not along the
+ * RDP-simplified node list. The simplified nodes exist only so guidance can
+ * say "turn left ahead"; if the ribbon were drawn from them it would visibly
+ * cut the corners the user actually walked around, which reads as a generated
+ * shortcut rather than a replay of their own walk.
+ *
+ * memory.simplified is still what gates visibility: it is non-empty only once
+ * Find My Car has built the route.
+ */
 function drawRoute(ctx: CanvasRenderingContext2D) {
-  const n = sim.memory.simplified
-  if (n.length < 2) return
+  if (sim.memory.simplified.length < 2) return
+  const pts = sim.memory.path
+  if (pts.length < 2) return
   const off = sim.phase === 'offRoute'
 
   ctx.save()
@@ -161,7 +179,7 @@ function drawRoute(ctx: CanvasRenderingContext2D) {
   ctx.lineWidth = 16
   ctx.strokeStyle = off ? WARN : ACCENT
   ctx.beginPath()
-  pathOnFloor(ctx, n)
+  pathOnFloor(ctx, pts, true)
   ctx.stroke()
 
   // Ribbon
@@ -169,41 +187,59 @@ function drawRoute(ctx: CanvasRenderingContext2D) {
   ctx.lineWidth = 6
   ctx.strokeStyle = off ? '#8390B4' : ACCENT
   ctx.beginPath()
-  pathOnFloor(ctx, n)
+  pathOnFloor(ctx, pts, true)
   ctx.stroke()
 
-  if (!off) drawChevrons(ctx, n)
+  if (!off) drawChevrons(ctx, pts)
   ctx.restore()
 }
 
-function drawChevrons(ctx: CanvasRenderingContext2D, n: { x: number; y: number; floor: number }[]) {
-  const t = (sim.time / 900) % 1
+/**
+ * Chevrons spaced by arc length along the raw trail rather than per segment,
+ * so a dense stretch of samples does not turn into a solid line of arrows.
+ */
+function drawChevrons(ctx: CanvasRenderingContext2D, pts: { x: number; y: number; floor: number }[]) {
+  const STEP = 46
+  const phase = ((sim.time / 900) % 1) * STEP
   ctx.fillStyle = '#0B0F1A'
-  for (let i = 0; i < n.length - 1; i++) {
-    if (n[i].floor !== sim.player.floor || n[i + 1].floor !== sim.player.floor) continue
-    const ax = toScreenX(n[i].x, n[i].y)
-    const ay = toScreenY(n[i].x, n[i].y) + HH
-    const bx = toScreenX(n[i + 1].x, n[i + 1].y)
-    const by = toScreenY(n[i + 1].x, n[i + 1].y) + HH
-    const len = Math.hypot(bx - ax, by - ay)
-    const step = 46
-    const count = Math.floor(len / step)
-    const ang = Math.atan2(by - ay, bx - ax)
-    for (let k = 0; k < count; k++) {
-      const f = (k + t) / Math.max(count, 1)
-      const px = ax + (bx - ax) * f
-      const py = ay + (by - ay) * f
-      ctx.save()
-      ctx.translate(px, py)
-      ctx.rotate(ang)
-      ctx.beginPath()
-      ctx.moveTo(-3, -4)
-      ctx.lineTo(4, 0)
-      ctx.lineTo(-3, 4)
-      ctx.closePath()
-      ctx.fill()
-      ctx.restore()
+
+  let acc = phase
+  let prev: { x: number; y: number } | null = null
+
+  for (let k = 0; k < pts.length; k++) {
+    const p = pts[pts.length - 1 - k]
+    if (p.floor !== sim.player.floor) {
+      prev = null
+      continue
     }
+    const cur = { x: toScreenX(p.x, p.y), y: toScreenY(p.x, p.y) + HH }
+    if (!prev) {
+      prev = cur
+      continue
+    }
+
+    const dx = cur.x - prev.x
+    const dy = cur.y - prev.y
+    const len = Math.hypot(dx, dy)
+    if (len > 0.001) {
+      const ang = Math.atan2(dy, dx)
+      while (acc + STEP <= len) {
+        acc += STEP
+        const f = acc / len
+        ctx.save()
+        ctx.translate(prev.x + dx * f, prev.y + dy * f)
+        ctx.rotate(ang)
+        ctx.beginPath()
+        ctx.moveTo(-3, -4)
+        ctx.lineTo(4, 0)
+        ctx.lineTo(-3, 4)
+        ctx.closePath()
+        ctx.fill()
+        ctx.restore()
+      }
+      acc -= len
+    }
+    prev = cur
   }
 }
 

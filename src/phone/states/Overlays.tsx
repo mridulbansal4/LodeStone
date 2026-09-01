@@ -25,7 +25,7 @@ export function RouteOverviewSheet() {
         </div>
         <div className="metric">
           <div className="v">{routeLen}</div>
-          <div className="k">Route points</div>
+          <div className="k">Guidance points</div>
         </div>
         <div className="metric">
           <div className="v">{floorEvents}</div>

@@ -242,11 +242,17 @@ function drawShaft(ctx: CanvasRenderingContext2D) {
   ctx.restore()
 }
 
-function poly(ctx: CanvasRenderingContext2D, pts: { x: number; y: number; floor: Floor }[], f: Floor) {
+function poly(
+  ctx: CanvasRenderingContext2D,
+  pts: { x: number; y: number; floor: Floor }[],
+  f: Floor,
+  reverse = false,
+) {
   let started = false
   let any = false
   ctx.beginPath()
-  for (const p of pts) {
+  for (let k = 0; k < pts.length; k++) {
+    const p = pts[reverse ? pts.length - 1 - k : k]
     if (p.floor !== f) {
       started = false
       continue
@@ -276,10 +282,17 @@ function drawTrail(ctx: CanvasRenderingContext2D, f: Floor) {
   ctx.restore()
 }
 
+/**
+ * The remembered route, drawn along the RAW trail played backwards. The
+ * RDP-simplified nodes drive the turn-by-turn wording only - drawing from them
+ * would cut the corners the user walked around and read as a shortcut.
+ */
 function drawRoute(ctx: CanvasRenderingContext2D, f: Floor) {
-  const n = sim.memory.simplified
-  if (n.length < 2) return
+  if (sim.memory.simplified.length < 2) return
+  const pts = sim.memory.path
+  if (pts.length < 2) return
   const off = sim.phase === 'offRoute'
+
   ctx.save()
   ctx.lineJoin = 'round'
   ctx.lineCap = 'round'
@@ -287,12 +300,12 @@ function drawRoute(ctx: CanvasRenderingContext2D, f: Floor) {
   ctx.globalAlpha = off ? 0.16 : 0.3
   ctx.lineWidth = 6
   ctx.strokeStyle = off ? WARN : ACCENT
-  if (poly(ctx, n, f)) ctx.stroke()
+  if (poly(ctx, pts, f, true)) ctx.stroke()
 
   ctx.globalAlpha = off ? 0.55 : 1
   ctx.lineWidth = 2.4
   ctx.strokeStyle = off ? '#8390B4' : ACCENT
-  if (poly(ctx, n, f)) ctx.stroke()
+  if (poly(ctx, pts, f, true)) ctx.stroke()
   ctx.restore()
 }
 

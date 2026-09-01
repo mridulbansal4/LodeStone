@@ -435,8 +435,9 @@ with `WALK_BACK_SPEED = 1.2 m/s` (human walking pace, not game pace). If there i
 
 ### 7.9 Route reversal and path following
 
-- The return route is `path.slice().reverse()` — the judge's own trail.
-- **Simplify before guiding:** Ramer–Douglas–Peucker with `ε = 1.2 m`, then re-index. This turns a noisy ~900-point trail into a clean ~40-node route and makes chevrons and instructions legible. Keep the raw trail for the world breadcrumbs; use the simplified route for guidance.
+- The return route is `path.slice().reverse()` — the judge's own trail. There is no pathfinding anywhere in the prototype, and `sim/trail.ts` deliberately has no access to the map grid, so it *cannot* compute a way around obstacles even by accident.
+- **Two representations, one walk.** RDP (`ε = 1.2 m`) produces a ~15-node *guidance skeleton* used for instruction wording, node advance and off-route distance. The *drawn ribbon* is the raw reversed trail.
+- This split is load-bearing. Drawing the ribbon from the skeleton visibly cuts the corners the judge walked around — measured on a real walk, the skeleton collapsed a 163-segment trail into 13 segments with a single 56 m chord — which reads as a generated shortcut rather than a replay of their own route. The skeleton stays for wording only; the line the judge follows is the line they walked.
 - Maintain `targetNodeIndex`. Advance it when the player is within `NODE_REACH = 3.0 m` of that node **and** on its floor.
 - Instruction generation from the simplified route:
   - Distance to next node > 15 m → "Continue {d} m"
@@ -701,7 +702,8 @@ parking-memory/
     │   ├── navigation.ts          Route reversal, node advance, instruction text
     │   ├── confidence.ts          Off-route / recovery / confidence heuristic
     │   ├── summary.ts             Natural-language memory summary templating
-    │   └── serialize.ts           exportRun / loadRun for replay
+    │   ├── serialize.ts           exportRun / loadRun for replay
+    │   └── verify.ts              Route walkability + continuity audits (test seam)
     ├── world/
     │   ├── maps/build.ts          Carving helpers, shared pad coordinates
     │   ├── maps/b3.ts             B3 parking grid, bays, columns, service dead end
@@ -816,6 +818,8 @@ A person with a browser can run this in ten minutes. Every item is pass/fail.
 - [ ] **F** morphs the phone and zooms the map to fit the full route.
 - [ ] The route ribbon appears in both the world and the phone, pointing back to the car.
 - [ ] A different exploration path produces a visibly different route — confirming it is not a preset.
+- [ ] Walking into the B3 service dead end and back out puts that detour in the drawn route, rather than bypassing it.
+- [ ] Every drawn route segment sampled at 0.2 m lands on a walkable tile (`auditDrawnRibbon()` in `sim/verify.ts` reports zero faults).
 - [ ] Instructions update as nodes are reached and never tell you to walk backwards.
 
 **Off route and recovery**
