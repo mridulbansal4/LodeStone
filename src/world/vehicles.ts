@@ -32,8 +32,13 @@ const SPECS: Record<CarModel, Spec> = {
   // Deliberately stylised: real cars are ~4.5 m long against 1.8 m tall, and at
   // this projection that ratio reads as a flat slab. Shortening the wheelbase
   // and keeping the height gives a silhouette that still says "car" at 60 px.
+  //
+  // Every model shares one length. Bays are pitched 6 m apart, so any variation
+  // in length lands directly on the gap between neighbours and the row stops
+  // looking parked. The models stay distinct through width, height and where
+  // the cabin sits, which is where the character was anyway.
   sports: {
-    len: 3.2, wid: 1.7, bodyLo: 0.38, bodyHi: 0.95,
+    len: 3.3, wid: 1.7, bodyLo: 0.38, bodyHi: 0.95,
     cabFrom: 0.3, cabTo: 0.68, cabInset: 0.3, cabHi: 1.35, wheelR: 0.33, nose: 0.3,
   },
   suv: {
@@ -41,17 +46,17 @@ const SPECS: Record<CarModel, Spec> = {
     cabFrom: 0.22, cabTo: 0.8, cabInset: 0.26, cabHi: 1.8, wheelR: 0.4, nose: 0.12,
   },
   hatchback: {
-    len: 3.0, wid: 1.65, bodyLo: 0.4, bodyHi: 1.02,
+    len: 3.3, wid: 1.65, bodyLo: 0.4, bodyHi: 1.02,
     cabFrom: 0.28, cabTo: 0.8, cabInset: 0.27, cabHi: 1.52, wheelR: 0.35, nose: 0.2,
   },
   // Tall cargo box running almost the full length, barely inset.
   van: {
-    len: 3.4, wid: 1.8, bodyLo: 0.44, bodyHi: 1.05,
+    len: 3.3, wid: 1.8, bodyLo: 0.44, bodyHi: 1.05,
     cabFrom: 0.16, cabTo: 0.96, cabInset: 0.12, cabHi: 2.15, wheelR: 0.38, nose: 0.1,
   },
   // Short cab set forward, leaving an open bed behind it.
   pickup: {
-    len: 3.5, wid: 1.78, bodyLo: 0.46, bodyHi: 1.12,
+    len: 3.3, wid: 1.78, bodyLo: 0.46, bodyHi: 1.12,
     cabFrom: 0.46, cabTo: 0.8, cabInset: 0.22, cabHi: 1.86, wheelR: 0.42, nose: 0.14,
   },
 }

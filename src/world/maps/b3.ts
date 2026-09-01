@@ -5,8 +5,8 @@ import { FloorMap, MAP_W, MAP_H, rect, outline, encase, idx, ELEV } from './buil
 
 // The player's car. Deliberately ~50 m from the lift lobby: the walk has to be
 // long enough to actually be a memory.
-export const CAR = { x: 25.5, y: 67.5, floor: -3 as const }
-export const SPAWN = { x: 25.5, y: 71.5 }
+export const CAR = { x: 28, y: 67.5, floor: -3 as const }
+export const SPAWN = { x: 28, y: 71.5 }
 
 export function buildB3(): FloorMap {
   const g = new Uint8Array(MAP_W * MAP_H)
@@ -24,7 +24,7 @@ export function buildB3(): FloorMap {
       // keep the lift lobby clear
       if (x + 4 > 52 && x < 70 && ry + 3 > 24 && ry < 40) continue
       // leave the player's own bay empty so they can stand at the car
-      const isHeroBay = ry === 66 && x === 24
+      const isHeroBay = ry === 66 && x === 26
       rect(g, x, ry, 4, 3, T.BAY)
       if (!isHeroBay) rect(g, x, ry, 4, 2, T.PARKED_CAR)
     }
@@ -60,9 +60,10 @@ export function buildB3(): FloorMap {
 
   encase(g, isWalkable, T.WALL)
 
-  // The player's bay, re-stamped after encasing so it stays clean.
-  rect(g, 24, 66, 4, 3, T.BAY)
-  outline(g, 24, 66, 4, 3, T.ROAD_MARK)
+  // The player's bay, re-stamped after encasing so it stays clean. Must match
+  // the isHeroBay coordinates above or the neighbouring car gets clipped.
+  rect(g, 26, 66, 4, 3, T.BAY)
+  outline(g, 26, 66, 4, 3, T.ROAD_MARK)
 
   return {
     floor: -3,
